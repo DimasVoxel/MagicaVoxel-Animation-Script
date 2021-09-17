@@ -1,0 +1,29 @@
+
+{
+
+        "frames":"100",
+        "SecondsPerRender":"0",
+        "saveRenders": false,
+
+        "Pitch": "-6.0",
+        "End_Pitch": "-6.0",
+
+        "Yaw": "-146.4",
+        "End_Yaw": "-146.4",
+
+        "Zoom": "308.1",
+        "End_Zoom": "224.6",
+
+        "Roll": "0",
+        "End_Roll": "0",
+
+        "Start_X": "493.5",
+        "End_X": "-130.6",
+
+        "Start_Y": "-233.1",
+        "End_Y": "176.6",
+        
+        "Start_Z": "134.4",
+        "End_Z": "171.7"
+
+}
