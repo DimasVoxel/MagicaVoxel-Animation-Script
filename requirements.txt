@@ -1,0 +1,2 @@
+pydirectinput==1.0.4
+pyperclip==1.8.2
