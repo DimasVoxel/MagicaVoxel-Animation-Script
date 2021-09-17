@@ -106,7 +106,6 @@ def writeToMv():
         command2 = "cam x "+str(x_start)+ " | cam y "+str(y_start)+ " | cam z "+str(z_start)
 
         print("Currently on Frame "+str(x)+"/"+str(frames))
-        print("Time remaining " + str(round((t_frames-x)*secondPerRender+((t_frames-x)*0.8),2)))
 
         getForegroundWindowTitle()
         pydi.press('f1')
