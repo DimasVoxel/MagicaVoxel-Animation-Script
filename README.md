@@ -1,6 +1,8 @@
 # MagicaVoxel-Animation-Script
 This little script was created to animate MagicaVoxels camera for more interesting and dynamic renders and animations.
 
+WINDOWS ONLY
+
 How to install:
 
 **Install** the latest version of Python: https://www.python.org/
