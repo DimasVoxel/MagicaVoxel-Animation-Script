@@ -1,8 +1,8 @@
-
 {
-"frames":"100",
-"SecondsPerRender":"0",
+"frames":    "100",
+"SecondsPerRender":"15",
 "saveRenders": true,
+"direction": "right",
 
 "Start_X":   "0",
 "Start_Y":   "0",
