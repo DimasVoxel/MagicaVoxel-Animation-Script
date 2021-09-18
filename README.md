@@ -17,3 +17,28 @@ You're now ready to execute the script.
 
 How to use:
 
+
+Explanation of camara.json:
+
+{
+"frames":    "100",       
+"SecondsPerRender":"15",
+"saveRenders": true,
+"direction": "right",
+
+"Start_X":   "0",
+"Start_Y":   "0",
+"Start_Z":   "0",
+"Zoom":      "0",
+"Pitch":     "0",
+"Yaw":       "0",
+"Roll":      "0",
+
+"End_X":     "0",
+"End_Y":     "0",
+"End_Z":     "0",
+"End_Zoom":  "0",
+"End_Pitch": "0",
+"End_Yaw":   "0",
+"End_Roll":  "0"
+}
