@@ -1,5 +1,5 @@
 # MagicaVoxel-Animation-Script
-This little script was created to animate MagicaVoxels camara for more interesting and dynamic renders and animations.
+This little script was created to animate MagicaVoxels camera for more interesting and dynamic renders and animations.
 
 How to install:
 
@@ -24,7 +24,7 @@ Explanation of camara.json:
 "frames":    "100",       #How many frames do you want to render  
 "SecondsPerRender":"15",  #How long do you want the script to wait for the render to complete - In seconds  
 "saveRenders": true,      #Toggle if renders should be saved | Either: true or false  
-"direction": "right",     #In which direction should the camara rotate Example: https://imgur.com/a/b8TBVBQ  
+"direction": "right",     #In which direction should the camera rotate Example: https://imgur.com/a/b8TBVBQ  
 
 "Start_X":   "0",         #The following options represent the ones out of MagicaVoxel  
 "Start_Y":   "0",  
