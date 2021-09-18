@@ -23,11 +23,8 @@ Explanation of camara.json:
 {
 
 "frames":    "100",       
-
 "SecondsPerRender":"15",
-
 "saveRenders": true,
-
 "direction": "right",
 
 
