@@ -21,41 +21,24 @@ How to use:
 Explanation of camara.json:
 
 {
+"frames":    "100",       #How many frames do you want to render  
+"SecondsPerRender":"15",  #How long do you want the script to wait for the render to complete - In seconds  
+"saveRenders": true,      #Toggle if renders should be saved | Either: true or false  
+"direction": "right",     #In which direction should the camara rotate Example: https://imgur.com/a/b8TBVBQ  
 
-"frames":    "100",       
-"SecondsPerRender":"15",
-"saveRenders": true,
-"direction": "right",
+"Start_X":   "0",         #The following options represent the ones out of MagicaVoxel  
+"Start_Y":   "0",  
+"Start_Z":   "0",  
+"Zoom":      "0",  
+"Pitch":     "0",  
+"Yaw":       "0",  
+"Roll":      "0",  
 
-
-
-"Start_X":   "0",
-
-"Start_Y":   "0",
-
-"Start_Z":   "0",
-
-"Zoom":      "0",
-
-"Pitch":     "0",
-
-"Yaw":       "0",
-
-"Roll":      "0",
-
-
-"End_X":     "0",
-
-"End_Y":     "0",
-
-"End_Z":     "0",
-
-"End_Zoom":  "0",
-
-"End_Pitch": "0",
-
-"End_Yaw":   "0",
-
-"End_Roll":  "0"
-
-}
+"End_X":     "0",  
+"End_Y":     "0",  
+"End_Z":     "0",  
+"End_Zoom":  "0",  
+"End_Pitch": "0",  
+"End_Yaw":   "0",   
+"End_Roll":  "0"  
+}  
