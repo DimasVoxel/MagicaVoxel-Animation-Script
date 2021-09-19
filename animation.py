@@ -18,10 +18,10 @@ def getForegroundWindowTitle() -> Optional[str]:            #Get current active 
     windll.user32.GetWindowTextW(hWnd, buf, length + 1)
     
     if buf.value == "MagicaVoxel | Ephtracy":              #If current active Window Magicavoxel then
-        return True                                        #Continue script (not very performant)
-    else:                                                     
-        time.sleep(5)                                      #Else wait
-        getForegroundWindowTitle()                         #Get current active window again
+        return False                                        #Continue script (not very performant)
+    else:
+        return True
+                                                             
 
 def exitprog():
     input("Press Enter to continue...")
@@ -38,30 +38,31 @@ def writeToMv():
         exitprog()
 
     print("Please open MagicaVoxel and make sure its in the foreground.")
-    getForegroundWindowTitle()                             #Wait until window in Active to start script we dont want the script spamming your discord for example
+    pause(True)                                            #Wait until window in Active to start script we dont want the script spamming your discord for example
     try:
         frames = float(data['frames'])                     #Get all values from json
         secondPerRender = float(data['SecondsPerRender'])
-        pitch = float(data['Pitch'])
-        end_pitch = float(data['End_Pitch'])
-        yaw = float(data['Yaw'])
-        end_yaw = float(data['End_Yaw'])
+
+        pitch = float(data['start']['Pitch'])
+        end_pitch = float(data['end']['Pitch'])
+        yaw = float(data['start']['Yaw'])
+        end_yaw = float(data['end']['Yaw'])
         if yaw < 0:                                            #Edge case since magicavoxel's yaw value goes from -180 to 180 instead of 0 to 360
             yaw = yaw - 360.000001                             #if you want to go in a circle numbers cant be same e.g -180 -> 180
             end_yaw = end_yaw - 360.000001
         if end_yaw < 0:
             end_yaw = end_yaw + 360.000001
             yaw = yaw + 360.000001  
-        zoom = float(data['Zoom'])
-        end_zoom = float(data['End_Zoom'])
-        roll = float(data['Roll'])
-        end_roll = float(data['End_Roll'])
-        x_start = float(data['Start_X'])
-        x_end = float(data['End_X'])
-        y_start = float(data['Start_Y'])
-        y_end = float(data['End_Y'])
-        z_start = float(data['Start_Z'])
-        z_end = float(data['End_Z'])
+        zoom = float(data['start']['Zoom'])
+        end_zoom = float(data['end']['Zoom'])
+        roll = float(data['start']['Roll'])
+        end_roll = float(data['end']['Roll'])
+        x_start = float(data['start']['X'])
+        x_end = float(data['end']['X'])
+        y_start = float(data['start']['Y'])
+        y_end = float(data['end']['Y'])
+        z_start = float(data['start']['Z'])
+        z_end = float(data['end']['Z'])
     except ValueError:
         print("Error in config. Did you accidentally input a letter instead of a number?")
         exitprog()
@@ -127,7 +128,7 @@ def writeToMv():
 
         print("Currently on Frame "+str(x+1)+"/"+str(int(frames)))  #Progress
 
-        getForegroundWindowTitle()                  #Find out if Magica is Active
+        pause(False)                                     #Find out if Magica is Active
         pydi.press('f1')                            #Open console
         pyperclip.copy(command)                     #Copy command paste command into mv
         
@@ -136,7 +137,7 @@ def writeToMv():
         pydi.keyUp("ctrl")
         pydi.press('enter')
         pyperclip.copy(command2)
-        getForegroundWindowTitle()
+        pause(False)
         pydi.keyDown("ctrl")
         pydi.press("v")
         pydi.keyUp("ctrl")
@@ -144,12 +145,35 @@ def writeToMv():
         pydi.press('f1')
         time.sleep(secondPerRender)                 #Wait image to render
 
+        
+
         if bool(data['saveRenders']):               #if saveRenders is true save image
-            getForegroundWindowTitle()              
+            pause(False)              
             pydi.press("6")
             time.sleep(0.4)
             pydi.press('enter')
             time.sleep(0.4)
+            
+
+
+def pause(firsttime):
+    if firsttime:
+        while getForegroundWindowTitle():
+            time.sleep(3)    
+        pass
+    else:   
+        if getForegroundWindowTitle():
+            print("Progress paused...")
+            while getForegroundWindowTitle():
+                time.sleep(5)                                   
+            print("WARNING: You exited magicavoxel while the render was in progress.")
+            print("To avoid problems make sure the console is not selected and if it has any contenct delete it as this might lead to some issues.")
+            input("Press enter to confirm")
+            print("Select magicavoxel")
+
+            while getForegroundWindowTitle():
+                time.sleep(5)              
+
 def main():
     writeToMv()
 
