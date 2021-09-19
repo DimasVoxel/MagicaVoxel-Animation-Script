@@ -30,19 +30,25 @@ Explanation of camara.json:
 "saveRenders": true,      #Toggle if renders should be saved | Either: true or false  
 "direction": "right",     #In which direction should the camera rotate Example: https://imgur.com/a/b8TBVBQ  
 
-"Start_X":   "0",         #The following options represent the ones out of MagicaVoxel  
-"Start_Y":   "0",  
-"Start_Z":   "0",  
-"Zoom":      "0",  
-"Pitch":     "0",  
-"Yaw":       "0",  
-"Roll":      "0",  
+"start": 
+    { 
+    "X":   "123",
+    "Y":   "0",
+    "Z":   "0",
+    "Zoom":      "200",
+    "Pitch":     "-90",
+    "Yaw":       "0",
+    "Roll":      "0"
+    },
 
-"End_X":     "0",  
-"End_Y":     "0",  
-"End_Z":     "0",  
-"End_Zoom":  "0",  
-"End_Pitch": "0",  
-"End_Yaw":   "0",   
-"End_Roll":  "0"  
-}  
+"end": 
+    { 
+    "X":     "0",
+    "Y":     "0",
+    "Z":     "0",
+    "Zoom":  "0",
+    "Pitch": "0",
+    "Yaw":   "0",
+    "Roll":  "0"
+    }
+}
