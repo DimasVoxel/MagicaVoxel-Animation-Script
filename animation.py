@@ -45,11 +45,13 @@ def writeToMv():
         pitch = float(data['Pitch'])
         end_pitch = float(data['End_Pitch'])
         yaw = float(data['Yaw'])
-        if yaw < 0:                                            #Edge case since magicavoxel's yaw value goes from -180 to 180 instead of 0 to 360
-            yaw = yaw + 360.000001                             #if you want to go in a circle numbers cant be same e.g -180 -> 180
         end_yaw = float(data['End_Yaw'])
+        if yaw < 0:                                            #Edge case since magicavoxel's yaw value goes from -180 to 180 instead of 0 to 360
+            yaw = yaw - 360.000001                             #if you want to go in a circle numbers cant be same e.g -180 -> 180
+            end_yaw = end_yaw - 360.000001
         if end_yaw < 0:
             end_yaw = end_yaw + 360.000001
+            yaw = yaw + 360.000001  
         zoom = float(data['Zoom'])
         end_zoom = float(data['End_Zoom'])
         roll = float(data['Roll'])
@@ -71,12 +73,12 @@ def writeToMv():
         m_pitch = 0
 
     try:    #catch by 0 div
-        if yaw > end_yaw and data['direction'] == "left": #Since the script cant know how exactly you want the camara to rotate 
-            m_yaw = float(((end_yaw)+(yaw))/(0-frames)*-1) #You can tell it to go left or right
+        if yaw < end_yaw and data['direction'] == "left":    #Since the script cant know how exactly you want the camara to rotate 
+            m_yaw = float(((yaw-end_yaw))/(0-frames))        #You can tell it to go left or right
         elif yaw < end_yaw and data['direction'] == "right": 
-            m_yaw = float(((180-end_yaw)+(180-yaw))/(0-frames)) 
-        elif yaw < end_yaw and data['direction'] == "left": 
-            m_yaw = float(((yaw-end_yaw))/(0-frames)) 
+            m_yaw = float(((yaw-end_yaw)+360)/(0-frames))
+        elif yaw > end_yaw and data['direction'] == "left": 
+            m_yaw = float(((yaw-end_yaw)-360)/(0-frames))
         elif yaw > end_yaw and data['direction'] == "right": 
             m_yaw = float(((yaw-end_yaw))/(0-frames))
         else:
@@ -123,7 +125,7 @@ def writeToMv():
         command = "cam rx "+str(pitch)+" | cam ry "+str(yaw)+" | cam zoom "+str(zoom)+" | cam rz "+str(roll) 
         command2 = "cam x "+str(x_start)+ " | cam y "+str(y_start)+ " | cam z "+str(z_start)
 
-        print("Currently on Frame "+str(x+1)+"/"+str(frames))   #Progress
+        print("Currently on Frame "+str(x+1)+"/"+str(int(frames)))  #Progress
 
         getForegroundWindowTitle()                  #Find out if Magica is Active
         pydi.press('f1')                            #Open console
