@@ -5,7 +5,7 @@ WINDOWS ONLY
 
 Download executable from here: https://dimasvoxel.gumroad.com/l/KrSWL
 
-How to install:
+How to install source code:
 
 **Install** the latest version of Python: https://www.python.org/
 
