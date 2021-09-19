@@ -17,7 +17,7 @@ You're now ready to execute the script.
 
 **python.exe .\animation.py**
 
-How to use: https://youtu.be/WcBpHJAYhVE 
+How to use: https://youtu.be/9lkYa2ao8XM
 
 
 Explanation of camara.json:
