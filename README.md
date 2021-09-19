@@ -3,6 +3,8 @@ This little script was created to animate MagicaVoxels camera for more interesti
 
 WINDOWS ONLY
 
+Download executable from here: https://dimasvoxel.gumroad.com/l/KrSWL
+
 How to install:
 
 **Install** the latest version of Python: https://www.python.org/
