@@ -1,7 +1,9 @@
 # MagicaVoxel-Animation-Script
 This little script was created to animate MagicaVoxels camera for more interesting and dynamic renders and animations.
 
-WINDOWS ONLY
+WINDOWS ONLY  
+Supported MV version: 99.6.4
+
 
 Download executable from here: https://dimasvoxel.gumroad.com/l/KrSWL
 
