@@ -1,49 +1,47 @@
 
 {
-
-
 "saveRenders": false,
 "keyframe":
     [ 
         {
-            "SecondsPerRender":"1", 
-            "Frames":        "4" ,
-            "Direction": "left",
+            "SecondsPerRender":"10", 
+            "Frames":          "10" ,
+            "Direction":       "right",
 
-            "X":     "0",
-            "Y":     "0",
-            "Z":     "0",
-            "Zoom":  "90",
-            "Pitch": "-90",
-            "Yaw":   "10",
-            "Roll":  "0"
+            "X":     "100",
+            "Y":     "200",
+            "Z":     "300",
+            "Zoom":  "300",
+            "Pitch": "-20",
+            "Yaw":   "0",
+            "Roll":  "10"
         },
     
         {
-            "SecondsPerRender":"2", 
-            "Frames":        "2" ,
-            "Direction": "left",
+            "SecondsPerRender":"5", 
+            "Frames":          "10" ,
+            "Direction":       "left",
 
-            "X":     "0",
-            "Y":     "0",
-            "Z":     "0",
-            "Zoom":  "90",
-            "Pitch": "-90",
-            "Yaw":   "-10",
-            "Roll":  "0"
+            "X":     "20",
+            "Y":     "300",
+            "Z":     "100",
+            "Zoom":  "400",
+            "Pitch": "-40",
+            "Yaw":   "50",
+            "Roll":  "-10"
         },
 
         {
-            "SecondsPerRender":"1", 
-            "Frames":        "4" ,
-            "Direction": "left",
+            "SecondsPerRender":"3", 
+            "Frames":          "20" ,
+            "Direction":       "right",
 
-            "X":     "0",
-            "Y":     "0",
-            "Z":     "0",
-            "Zoom":  "90",
+            "X":     "300",
+            "Y":     "300",
+            "Z":     "300",
+            "Zoom":  "300",
             "Pitch": "-90",
-            "Yaw":   "10",
+            "Yaw":   "0",
             "Roll":  "0"
         }
     ]
