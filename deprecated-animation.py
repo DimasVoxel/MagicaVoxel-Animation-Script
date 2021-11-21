@@ -29,7 +29,7 @@ def exitprog():
 
 def writeToMv():                                                            
     try:
-        with open('camara.json') as json_file:             #Load Json file
+        with open('old-camara.json') as json_file:             #Load Json file
             data = json.load(json_file)                    #Write Json to var
         json_file.close()                                  #Close Json file
     except:                                                #If json not found error
