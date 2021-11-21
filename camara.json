@@ -1,0 +1,53 @@
+
+{
+
+
+"saveRenders": false,
+"keyframe":
+    [ 
+        {
+            "SecondsPerRender":"1", 
+            "Frames":        "4" ,
+            "Direction": "left",
+
+            "X":     "0",
+            "Y":     "0",
+            "Z":     "0",
+            "Zoom":  "90",
+            "Pitch": "-90",
+            "Yaw":   "10",
+            "Roll":  "0"
+        },
+    
+        {
+            "SecondsPerRender":"2", 
+            "Frames":        "2" ,
+            "Direction": "left",
+
+            "X":     "0",
+            "Y":     "0",
+            "Z":     "0",
+            "Zoom":  "90",
+            "Pitch": "-90",
+            "Yaw":   "-10",
+            "Roll":  "0"
+        },
+
+        {
+            "SecondsPerRender":"1", 
+            "Frames":        "4" ,
+            "Direction": "left",
+
+            "X":     "0",
+            "Y":     "0",
+            "Z":     "0",
+            "Zoom":  "90",
+            "Pitch": "-90",
+            "Yaw":   "10",
+            "Roll":  "0"
+        }
+    ]
+}
+
+
+
