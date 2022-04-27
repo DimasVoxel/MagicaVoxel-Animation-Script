@@ -7,12 +7,15 @@
 </p>
 
 ## 📝 Table of Contents
-
+- [Download](#download)
 - [What is it?](#problem_statement)
 - [Requirements](#Requirements)
 - [How to use](#how_to_use)
 - [Limitations](#limitations)
 
+## Download <a name = "download"></a>
+
+Download an .exe for from Gumroad: https://dimasvoxel.gumroad.com/l/KrSWL
 
 ## 🧐 What is this? <a name = "What is it"></a>
 
