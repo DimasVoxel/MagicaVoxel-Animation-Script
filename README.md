@@ -1,56 +1,34 @@
-# MagicaVoxel-Animation-Script
-This little script was created to animate MagicaVoxels camera for more interesting and dynamic renders and animations.
+<h3 align="center">Animation Script for Magicavoxel</h3>
 
-WINDOWS ONLY  
-Supported MV version: 99.6.4
+---
 
+<p align="center"> 
+    <br> 
+</p>
 
-Download executable from here: https://dimasvoxel.gumroad.com/l/KrSWL
+## 📝 Table of Contents
 
-How to install source code:
-
-**Install** the latest version of Python: https://www.python.org/
-
-Once installed **open Powershell** using **windows key + r** and input powershell into the newly opened textbox
-
-Navigate to the folder you saved this script at and exectue:
-
-**pip install -r requirements.txt**
-
-You're now ready to execute the script. 
-
-**python.exe .\animation.py**
-
-How to use: https://youtu.be/9lkYa2ao8XM
+- [What is it?](#problem_statement)
+- [Requirements](#Requirements)
+- [How to use](#how_to_use)
+- [Limitations](#limitations)
 
 
-Explanation of camara.json:
+## 🧐 What is this? <a name = "What is it"></a>
 
-{
-"frames":    "100",       #How many frames do you want to render  
-"SecondsPerRender":"15",  #How long do you want the script to wait for the render to complete - In seconds  
-"saveRenders": true,      #Toggle if renders should be saved | Either: true or false  
-"direction": "right",     #In which direction should the camera rotate Example: https://imgur.com/a/b8TBVBQ  
+This small script was created to create more dynamic renders and animations.
 
-"start":   
-    {   
-    "X":   "123",  
-    "Y":   "0",  
-    "Z":   "0",  
-    "Zoom":      "200",  
-    "Pitch":     "-90",  
-    "Yaw":       "0",  
-    "Roll":      "0"  
-    },
+This is a script that interacts with magicavoxel via the built-in magicavoxel console to enable animation of various parameters that cannot normally be animated, such as sun position, camera movement and more.
 
-"end":   
-    {   
-    "X":     "0",  
-    "Y":     "0",   
-    "Z":     "0",  
-    "Zoom":  "0",  
-    "Pitch": "0",  
-    "Yaw":   "0",  
-    "Roll":  "0"  
-    }  
-}  
+## 💡 Requirements <a name = "Requirements"></a>
+
+- Magicavoxel 0.99.7
+- Windows 10 (7/8 Not tested)
+
+## 🎈 How to use <a name = "how_to_use"></a>
+
+The script needs a config.json to know which parameters to animate. 
+To create a usable config, use the Config Generator that also comes with this project. 
+Save the config from the generator and put it in the same folder as the animation script. Then run the animation script and have magicavoxel open as well.
+
+The renders are saved in the magicavoxel export folder.
