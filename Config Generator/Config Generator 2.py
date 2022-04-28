@@ -649,19 +649,24 @@ def translateNewParam(callback,data,userdata):
             fillConfig(keyframeNum,paramKey,value,paramType)
             if keyType == "float":
                 with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
-                    dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
+                    #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
+                    dpg.add_button(label="Del",width=35,height=19,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
                     dpg.add_input_float(tag=tagKey,label=labelName,max_value=maxValue,default_value=value,min_value=minValue,max_clamped=True,min_clamped=True,parent="group:"+tagKey,callback=writeToConfig,user_data=callbackData,width=200)
             if keyType == "int":
                 with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
-                    dpg.add_image_button(texture_tag="trashImg",width=13,height=13)
+                    #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
+                    dpg.add_button(label="Del",width=35,height=19,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
                     dpg.add_input_int(tag=tagKey,label=labelName,max_value=maxValue,default_value=value,min_value=minValue,max_clamped=True,min_clamped=True,parent="group:"+tagKey,callback=writeToConfig,user_data=callbackData,width=200)
+
             if keyType == "bool":
                 with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
-                    dpg.add_image_button(texture_tag="trashImg",width=13,height=13)
+                    #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
+                    dpg.add_button(label="Del",width=35,height=19,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
                     dpg.add_checkbox(tag=tagKey,label=labelName,parent="group:"+tagKey,default_value=value,callback=writeToConfig,user_data=callbackData)
             if keyType == "string":
                 with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
-                    dpg.add_image_button(texture_tag="trashImg",width=13,height=13)
+                    #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
+                    dpg.add_button(label="Del",width=35,height=19,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
                     dpg.add_input_text(tag=tagKey,label=labelName,parent="group:"+tagKey,default_value=value,callback=writeToConfig,user_data=callbackData,width=200)
         else: 
             #print("Fill with new param: "+keyframeNum+" "+paramKey+" "+paramValue+" "+paramType)
@@ -790,15 +795,16 @@ dpg.create_context()
 
 #look for trash.png in the same directory as this script and in ui folder
 #dpg.load_image("trash.png")
-try: 
-    path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'ui', 'trash.png'))
-
-    width, height, channels, data = dpg.load_image(path)
-    with dpg.texture_registry(show=False):
-        dpg.add_static_texture(width, height, data, tag="trashImg")
-except TypeError:
-    print("Ui not found, make sure the ui folder is in the same directory as this script")
-    exit()
+#  try: 
+#      path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'ui', 'trash.png'))
+#
+#      width, height, channels, data = dpg.load_image(path)
+#      with dpg.texture_registry(show=False):
+#          dpg.add_static_texture(width, height, data, tag="trashImg")
+#  except TypeError:
+#      print("script was looking for in:"+path)
+#      print("Ui not found, make sure the ui folder is in the same directory as this script")
+#      exit()
 
 with dpg.viewport_menu_bar():
     with dpg.menu(label="File"):
