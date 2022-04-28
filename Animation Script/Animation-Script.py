@@ -220,7 +220,7 @@ def liniar(currentkeyframe, data):
             print("#"*(os.get_terminal_size().columns))
 
 
-            #mvinput(command,secondPerRender)
+            mvinput(command,secondPerRender)
 
     except ValueError:
         print("Error in config. Did you accidentally input a letter instead of a number?")
@@ -238,7 +238,7 @@ def mvinput(command,secondPerRender):
         pydi.keyUp("ctrl")
         time.sleep(0.2) 
         pydi.press('enter')
-        if bool(data["global"]['saveRenders']):         
+        if bool(data["global"]['saverenders']):         
             time.sleep(0.2)
             pydi.press('enter')
     time.sleep(secondPerRender)              
