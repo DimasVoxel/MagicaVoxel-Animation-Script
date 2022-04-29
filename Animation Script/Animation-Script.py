@@ -41,7 +41,7 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
             lerparray = []                                                              #Array to store the lerp values
             currentkeyframe = firstkeyframe                                             #define starting keyframe 
             count = 0                           
-            while currentkeyframe <= lastkeyframe+1:                                     #loop through all keyframes until keyframe is no longer a bezier keyframe 
+            while currentkeyframe < lastkeyframe+1:                                     #loop through all keyframes until keyframe is no longer a bezier keyframe 
                 if key.find("ry") != -1:                                                        #If key is yaw                         
                     if len(lerparray) == 0:                                             #If lerparray is empty             
                         lerparray.append(float(data['keyframe'][currentkeyframe]["param"]["cam ry"]))#Add first value to lerparray
@@ -65,7 +65,7 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
         print("Frame: " + str(frame+1) + " of " + str(ammountframes))
         print("Keyframe: " + str(firstkeyframe))
         print("Last command: " + str(command))
-        mvinput(command,float(data["keyframe"][firstkeyframe]["SecondsPerRender"])) 
+        #mvinput(command,float(data["keyframe"][firstkeyframe]["SecondsPerRender"])) 
         
     global keyframenum
     keyframenum = keyframenum + 1
@@ -136,7 +136,12 @@ def readconfig():
                                                                 #Run through all keyframes     
     while keyframenum < len(data['keyframe']):
         try:                                                    #Storing all interpolation values in a list
-            interpolation.append(str(data['keyframe'][keyframenum]["option"]['interpolation']))
+            if data['keyframe'][keyframenum]['option']['interpolation'] == "linear":
+                interpolation.append("linear")
+            elif data['keyframe'][keyframenum]['option']['interpolation'] == "bezier" and not data['keyframe'][keyframenum]['option']['sequence']:
+                interpolation.append("bezier")
+            elif data['keyframe'][keyframenum]['option']['interpolation'] == "bezier" and data['keyframe'][keyframenum]['option']['sequence']:
+                interpolation.append("1")
         except:                                                 #If no interpolation is found for a keyframe then it is set 1
             interpolation.append("1")                           #How it works Key frame start with Bezier from 1 - 5th keyframe. This would look like this in the list Bezier 1 1 1 1 
         keyframenum += 1                                        #untill it finds another interpolation type for example linear 6 - 7 -> Bezier 1 1 1 1 Linaer 1 

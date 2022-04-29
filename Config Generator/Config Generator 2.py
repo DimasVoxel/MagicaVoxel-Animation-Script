@@ -1,7 +1,5 @@
 
 import json
-import pprint
-import os
 import dearpygui.dearpygui as dpg
 
 global config 
@@ -383,14 +381,22 @@ magicavoxel_paramters = {
         },
         "direction":{
             "desc":"Animation direction - Clockwise / Anticlockwise",
-            "optionType":"string",
-            "default":"Clockwise"
+            "optionType":"booltext",
+            "on":"clockwise",
+            "off":"anticlockwise"
         },
         "interpolation": {
             "desc":"Interpolation for camera path - linear/bezier",
-            "optionType":"string",
-            "default":"linear"
-        }
+            "optionType":"booltext",
+            "on":"bezier",
+            "off":"linear"
+        },
+        "sequence":{
+            "desc":"Add Keyframe to squence - Hover for more infos",
+            "optionType":"bool",
+            "default":False,
+            "tooltip":"Enable this to add keyframe to sequence, enables you to create a longer camera path (works only with bezier).\nExample Without: a -> b b -> c c -> d \nExample With:    a -> b -> c -> d\nWatch the timeline below"
+        },
     },
     "global": {
         "saverenders":{
@@ -403,6 +409,7 @@ magicavoxel_paramters = {
         "enable animation":{
             "desc":"Enable animation",
             "optionType":"bool"
+            
         },
         "loop":{
             "desc":"Loop animation - Frames will always loop back to 0",
@@ -412,7 +419,7 @@ magicavoxel_paramters = {
             "desc":"Starting Frame",
             "optionType":"int",
             "min":"0",
-            "max":"120"
+            "max":"120",
         },
         "endframe":{
             "desc":"Ending Frame - Starts looping from",
@@ -492,6 +499,7 @@ def removeConfig(keyframe,param,attribute):
         del config["keyframe"][keyframe]
     elif attribute == "param":
         del config["keyframe"][keyframe]["param"][param]
+    updateTimeLine()
 
 def fillConfig(keyframe,param,value,attribute):
     #keyframe = Number of keyframe
@@ -525,7 +533,10 @@ def fillConfig(keyframe,param,value,attribute):
             config["keyframe"][keyframe]["option"][param] = value
         elif attribute == "animation":
             config["keyframe"][keyframe]["animation"][param] = value
-    #updateTimeLine()
+
+    if param == "squence" or param == "frames" or param == "interpolation":
+        updateTimeLine()
+
 
 def writeToConfig(callback,data,userdata):
     #fillConfig(keyframe,param,value,attribute):
@@ -567,7 +578,7 @@ def addNewTabButton(callback,data):
             with dpg.child_window(autosize_x=True, height=800,parent="keyframe:"+nextkeyframe,no_scrollbar=True):
                 with dpg.group(horizontal=True, width=0):
                     with dpg.child_window(width=600, height=790):
-                        with dpg.child_window(autosize_x=True,height=140):
+                        with dpg.child_window(autosize_x=True,height=160):
                             dpg.add_text("Keyframe options")
                             dpg.add_separator()
                             for mvcommand,value in magicavoxel_paramters["option"].items():
@@ -600,6 +611,7 @@ def addNewTabButton(callback,data):
                                     dpg.add_button(label=value["desc"],tag="light_button:"+mvcommand+":"+nextkeyframe,parent="camera_tab:"+nextkeyframe,callback=translateNewParam,user_data=(nextkeyframe,mvcommand,value,"param"))
             if i != 0:
                 sync(i)
+    updateTimeLine()
 
 def sync(keyframe):
     global config
@@ -615,6 +627,8 @@ def translateNewParam(callback,data,userdata):
     #Userdata 1 = param name/key 
     #Userdata 2 = param value
     #Userdata 3 = attribute
+
+
 
     keyframeNum = str(userdata[0])
     paramKey = str(userdata[1])
@@ -642,43 +656,90 @@ def translateNewParam(callback,data,userdata):
                 value = False
             else: 
                 value = ""
+    if keyType == "booltext":
+        value = magicavoxel_paramters[paramType][paramKey]["off"]
+
+    if callback == "init" or callback == "animation" or callback == "global":
+        value = config["keyframe"][int(keyframeNum)][paramType][paramKey]
 
     if dpg.does_alias_exist(tagKey) != True:
+        fillConfig(keyframeNum,paramKey,value,paramType)
+        if paramKey == "sequence":
+            with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
+                dpg.add_checkbox(tag=tagKey,label=labelName,parent="group:"+tagKey,default_value=value,callback=changeInterpol,user_data=callbackData)
+                
+        elif keyType == "float":
+            with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
+                #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
+                dpg.add_input_float(tag=tagKey,label=labelName,max_value=maxValue,default_value=value,min_value=minValue,max_clamped=True,min_clamped=True,parent="group:"+tagKey,callback=writeToConfig,user_data=callbackData,width=200)
+        elif keyType == "int":
+            with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
+                #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
+                dpg.add_input_int(tag=tagKey,label=labelName,max_value=maxValue,default_value=value,min_value=minValue,max_clamped=True,min_clamped=True,parent="group:"+tagKey,callback=writeToConfig,user_data=callbackData,width=200)
+        elif keyType == "bool":
+            with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
+                #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
+                dpg.add_checkbox(tag=tagKey,label=labelName,parent="group:"+tagKey,default_value=value,callback=writeToConfig,user_data=callbackData)
+        elif keyType == "string":
+            with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
+                #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
+                dpg.add_input_text(tag=tagKey,label=labelName,parent="group:"+tagKey,default_value=value,callback=writeToConfig,user_data=callbackData,width=200)
+        elif keyType == "booltext":
+            with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
+                #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
+                dpg.add_button(tag=tagKey,label=value,parent="group:"+tagKey,callback=changeText,user_data=callbackData)
+                dpg.add_text(labelName,tag="infotext:"+tagKey,parent="group:"+tagKey)
+        
         if paramType == "param":
-            #print("Fill with new param: "+keyframeNum+" "+paramKey+" "+paramValue+" "+paramType)
-            fillConfig(keyframeNum,paramKey,value,paramType)
-            if keyType == "float":
-                with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
-                    #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
-                    dpg.add_button(label="Del",width=35,height=19,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
-                    dpg.add_input_float(tag=tagKey,label=labelName,max_value=maxValue,default_value=value,min_value=minValue,max_clamped=True,min_clamped=True,parent="group:"+tagKey,callback=writeToConfig,user_data=callbackData,width=200)
-            if keyType == "int":
-                with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
-                    #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
-                    dpg.add_button(label="Del",width=35,height=19,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
-                    dpg.add_input_int(tag=tagKey,label=labelName,max_value=maxValue,default_value=value,min_value=minValue,max_clamped=True,min_clamped=True,parent="group:"+tagKey,callback=writeToConfig,user_data=callbackData,width=200)
+            dpg.add_button(label="Del",width=35,height=19,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData),parent="group:"+tagKey,before=tagKey)
 
-            if keyType == "bool":
-                with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
-                    #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
-                    dpg.add_button(label="Del",width=35,height=19,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
-                    dpg.add_checkbox(tag=tagKey,label=labelName,parent="group:"+tagKey,default_value=value,callback=writeToConfig,user_data=callbackData)
-            if keyType == "string":
-                with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
-                    #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
-                    dpg.add_button(label="Del",width=35,height=19,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
-                    dpg.add_input_text(tag=tagKey,label=labelName,parent="group:"+tagKey,default_value=value,callback=writeToConfig,user_data=callbackData,width=200)
-        else: 
-            #print("Fill with new param: "+keyframeNum+" "+paramKey+" "+paramValue+" "+paramType)
-            fillConfig(keyframeNum,paramKey,value,paramType)
-            if keyType == "float":
-                dpg.add_input_float(tag=tagKey,label=labelName,max_value=maxValue,default_value=value,min_value=minValue,max_clamped=True,min_clamped=True,parent=parentKey,callback=writeToConfig,user_data=callbackData,width=200)
-            if keyType == "int":
-                dpg.add_input_int(tag=tagKey,label=labelName,max_value=maxValue,default_value=value,min_value=minValue,max_clamped=True,min_clamped=True,parent=parentKey,callback=writeToConfig,user_data=callbackData,width=200)
-            if keyType == "bool":
-                dpg.add_checkbox(tag=tagKey,label=labelName,parent=parentKey,default_value=value,callback=writeToConfig,user_data=callbackData)
-            if keyType == "string":
-                dpg.add_input_text(tag=tagKey,label=labelName,parent=parentKey,default_value=value,callback=writeToConfig,user_data=callbackData,width=200)
+        if "tooltip" in userdata[2]:
+            with dpg.tooltip(tag="tooltip:"+tagKey,parent=tagKey):
+                dpg.add_text(userdata[2]["tooltip"],parent="tooltip:"+tagKey)
+                
+def changeInterpol(callback,data,userdata):
+    global config
+    keyframeNum = str(userdata[0])
+    paramKey = str(userdata[1])
+    paramValue = str(userdata[2])
+    paramType = str(userdata[3])
+    tagKey = "input:interpolation:"+keyframeNum
+
+    #print(data)
+    #print(keyframeNum)
+    if data == True:
+        fillConfig(keyframeNum,"interpolation","bezier","option")
+        fillConfig(keyframeNum,paramKey,data,"option")
+        dpg.disable_item(tagKey)
+        dpg.set_item_label(tagKey,"bezier")
+    if data == False:
+        fillConfig(keyframeNum,"interpolation","linear","option")
+        fillConfig(keyframeNum,paramKey,data,"option")
+        dpg.enable_item(tagKey)
+        dpg.set_item_label(tagKey,"linear")
+    updateTimeLine()
+
+def changeText(callback,data,userdata):
+    global config
+    keyframeNum = str(userdata[0])
+    paramKey = str(userdata[1])
+    paramValue = str(userdata[2])
+    paramType = str(userdata[3])
+    offValue = magicavoxel_paramters[paramType][paramKey]["off"]
+    onValue = magicavoxel_paramters[paramType][paramKey]["on"]
+    tagKey = "input:"+paramKey+":"+keyframeNum
+
+
+    if dpg.get_item_label(tagKey) == offValue:
+        value = onValue
+        dpg.set_item_label(item=tagKey,label=value)
+    else:
+        value = offValue
+        dpg.set_item_label(item=tagKey,label=value)
+
+    #print(keyframeNum,paramKey,value,paramType)
+    fillConfig(keyframeNum,paramKey,value,paramType)
+
 
 ########################################################################################################################
 def initialize():
@@ -692,11 +753,12 @@ def initialize():
             with dpg.child_window(width=900, height=800,parent="keyframe:"+nextkeyframe,no_scrollbar=True):
                 with dpg.group(horizontal=True, width=0):
                     with dpg.child_window(width=600, height=790):
-                        with dpg.child_window(autosize_x=True,height=140):
+                        with dpg.child_window(autosize_x=True,height=160):
                             dpg.add_text("Keyframe options")
                             dpg.add_separator()
                             for mvcommand,value in magicavoxel_paramters["option"].items():
                                 mvcommand = str(mvcommand)
+
                                 translateNewParam("init","",(nextkeyframe,mvcommand,value,"option"))
                                 #Tag = keyframe:set pt_fix_focus:0 e.g Keyframe + key + num Keyframe
                         with dpg.child_window(autosize_x=True,height=140):
@@ -737,57 +799,87 @@ def initialize():
                         #Userdata 3 = attribute
 
 ########################################################################################################################
-#TimeLine
+#TimeLine  
 
-def updateTimeLine2():
-    if dpg.does_alias_exist("timeline") == True:
-        dpg.delete_item("timeline")
-    with dpg.group(parent="Third Window",horizontal=True,tag="timeline"):
-        for keyframe in config["keyframe"]:
-            #print(keyframe["option"]["interpolation"])
-            with dpg.child_window(width=100,height=40):
-                dpg.add_text(str(keyframe["option"]["interpolation"]))
-
-            ##print("TIMELINE")
-        
+#Pretty clumsy but it works
 def updateTimeLine():
     if dpg.does_alias_exist("timeline") == True:
         dpg.delete_item("timeline")
     offset = 20
-    with dpg.group(parent="Third Window",horizontal=True,tag="timeline"):
-        with dpg.drawlist(width=950, height=100):  # or you could use dpg.add_drawlist and set parents manually
-            for keyframe in config["keyframe"]:
-                if "frames" in keyframe["option"] and "interpolation" in keyframe["option"]:
-                    for i in range(keyframe["option"]["frames"]):
-                        print("keyframe:"+str(i))
-                        if keyframe["option"]["interpolation"] == "linear":
-                            colour = (200,200,255,255)
-                        else:
-                            if keyframe["option"]["interpolation"] == "bezier":
+    keyframenum = 0
+    totalframes = 0
+    issequence = False
+    try:
+        with dpg.group(parent="Third Window",horizontal=True,tag="timeline",show=False):
+            with dpg.drawlist(width=3000, height=100,tag="drawlist"):  # or you could use dpg.add_drawlist and set parents manually
+                while keyframenum < len(config["keyframe"])-1:
+                    if "frames" in config["keyframe"][keyframenum]["option"] and "interpolation" in config["keyframe"][keyframenum]["option"] and "sequence" in config["keyframe"][keyframenum]["option"]:
+                        if config["keyframe"][keyframenum]["option"]["interpolation"] == "linear" and not config["keyframe"][keyframenum]["option"]["sequence"] == True:
+                            frameamount = config["keyframe"][keyframenum]["option"]["frames"]
+                            issequence = False
+                            textKey = keyframenum
+                        elif config ["keyframe"][keyframenum]["option"]["interpolation"] == "bezier" and not config["keyframe"][keyframenum]["option"]["sequence"] == True:
+                            frameamount = config["keyframe"][keyframenum]["option"]["frames"]
+                            textKey = keyframenum
+                            startKey = keyframenum 
+                            if keyframenum+1 < len(config["keyframe"])-1:
+                                if config["keyframe"][keyframenum+1]["option"]["sequence"] == True:
+                                    while keyframenum < len(config["keyframe"])-1 and config["keyframe"][keyframenum+1]["option"]["sequence"] == True:
+                                        keyframenum += 1
+                                        frameamount += config["keyframe"][keyframenum]["option"]["frames"]
+                                        issequence = True
+                                        textKey = str(startKey)+"-"+str(keyframenum)
+                                        #print(keyframenum)
+                                        print(keyframenum > len(config["keyframe"])-1)
+                                        if keyframenum+1 > len(config["keyframe"])-1:
+                                            print("wetf")
+                                            break
+                        else: 
+                            frameamount = 0
+                        for i in range(frameamount):
+                            #print("keyframe:"+str(i))
+                            if config["keyframe"][keyframenum]["option"]["interpolation"] == "linear" and issequence == False:
+                                colour = (200,200,255,255)
+                            elif config["keyframe"][keyframenum]["option"]["interpolation"] == "bezier" or issequence == True:
                                 colour = (60,255,20,255)
                             else: 
-                                colour = (100,105,20,255)
-                        if i % 5 == 0:
-                            if i % 25 == 0:
-                                dpg.draw_rectangle( pmin=(0+offset,30),     # top left corner 
-                                                    pmax=(1+offset,75),   # bottom right corner
-                                                    color=colour,thickness=1)
-                                dpg.add_text(str(i),pos=(offset+5,120),parent="timeline",)
-                            else:
-                                dpg.draw_rectangle( pmin=(0+offset,40),     # top left corner 
-                                                    pmax=(1+offset,65),   # bottom right corner
-                                                    color=colour,thickness=1,)
-                            offset += 8
+                                colour = (255,0,0,255)
+                            if i == 0:
+                                colour = (255,255,0,255)
+                            if i % 10 == 0:
+                                if i == 0:
+                                    dpg.draw_rectangle( pmin=(0+offset,30),     # top left corner 
+                                                        pmax=(1+offset,75),     # bottom right corner
+                                                        color=colour,thickness=1)
+                                    dpg.add_text(str(i),pos=(offset+5,120),parent="timeline",)
+                                    dpg.add_text("KeFr:"+str(textKey),pos=(offset+5,40),parent="timeline",)
+                                elif i % 25 == 0:
+                                        dpg.draw_rectangle( pmin=(0+offset,35),     # top left corner 
+                                                            pmax=(1+offset,70),     # bottom right corner
+                                                            color=colour,thickness=1)
+                                        dpg.add_text(str(i),pos=(offset+5,120),parent="timeline",)
+                                else:
+                                    dpg.draw_rectangle( pmin=(0+offset,40),     # top left corner 
+                                                        pmax=(1+offset,65),     # bottom right corner
+                                                        color=colour,thickness=1,)
+                                offset += 8
+                        totalframes = frameamount + totalframes
+                    
 
-            sequence = []
-
-            for keyframe in config["keyframe"]:
-                if "interpolation" in keyframe["option"]:
-                    sequence.append(keyframe["option"]["interpolation"])
-
-            
+                        keyframenum = keyframenum + 1
+            dpg.add_text(str("End Frame total: "+str(totalframes)),pos=(offset+10,78),parent="timeline",)
+            dpg.show_item("timeline")
+            #if offset under 950 width = 950 if offset larger than 950 width = offset
+    except KeyError:
+        print("KeyError")
+    if offset > 950:
+        dpg.set_item_width("timeline",offset+200)
+        dpg.set_item_width("drawlist",offset+200)
+    else:
+        dpg.set_item_width("timeline",950)
+        dpg.set_item_width("drawlist",offset+200)
             #calculate bounding box
-            
+    
 
 ########################################################################################################################
 
@@ -823,13 +915,12 @@ with dpg.window(tag="Primary Window",label="Config Generator",menubar=True):
         with dpg.tab_bar(label="keyframe_bar",tag="keyframe_bar"):    
             dpg.add_tab_button(label="+",tag="add",trailing=True,callback=addNewTabButton)
             dpg.add_tab_button(label="-",tag="remove",trailing=True,callback=deleteTabButton)
-    with dpg.child_window(tag="Third Window",parent="Primary Window"):
+    with dpg.child_window(tag="Third Window",height=150,parent="Primary Window",width=950):
         dpg.add_text("Timeline")
         dpg.add_separator()
     
 
 initialize()
-
 
 
 #dpg.show_documentation()
