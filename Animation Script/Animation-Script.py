@@ -1,4 +1,5 @@
 
+from multiprocessing.reduction import duplicate
 from time import process_time_ns, thread_time_ns
 from typing import Optional
 from ctypes import wintypes, windll, create_unicode_buffer
@@ -36,27 +37,53 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
     while frame < ammountframes:                                                        #Repeats for the ammount of frames
         frame += 1           
         command = []   
-        commandstring = " "                                                        
-        for key, _ in data["keyframe"][firstkeyframe]["param"].items():                   #Get all items of the first keyframe
+        commandstring = " "                          
+        if bool(data["global"]['saverenders']) == True and frame != 0:
+            commandstring ="snap scene | "    
+
+        #collect all parameters of all keyframes
+        params = []
+        isdiplicate = False
+        for keyframe in range(firstkeyframe, lastkeyframe + 1):
+            for param,value in data["keyframe"][keyframe]["param"].items():
+                if param not in params:
+                    params.append(param)
+                else:
+                    isdiplicate = True
+
+        if isdiplicate == False:
+            print("Your animation does not make sense.")
+            print("The animation has been stopped since there are no parameters to animate.\nFor an animation you need atleast 2 keyframes with the same parameter")
+            input()
+            exitprog()
+        for i in range(len(params)):                   #Get all items of the first keyframe
+            key = params[i]
             lerparray = []                                                              #Array to store the lerp values
             currentkeyframe = firstkeyframe                                             #define starting keyframe 
             count = 0                           
             while currentkeyframe < lastkeyframe+1:                                     #loop through all keyframes until keyframe is no longer a bezier keyframe 
+                
                 if key.find("ry") != -1:                                                        #If key is yaw                         
                     if len(lerparray) == 0:                                             #If lerparray is empty             
                         lerparray.append(float(data['keyframe'][currentkeyframe]["param"]["cam ry"]))#Add first value to lerparray
                         currentkeyframe += 1                       #Add first yaw value to lerparray
                     try:                                                                                                #Try to get next yaw value          
-                        lerparray.append(leftright(float(lerparray[count]), float(data["keyframe"][currentkeyframe]["param"]["cam ry"]), data["keyframe"][currentkeyframe-1]["Option"]["direction"]))  #Sends first yaw value (from lerp array appended two lines above) to leftright + current yaw value and in which direction to move line 77
+                        lerparray.append(leftright(float(data["keyframe"][currentkeyframe]["param"]["cam ry"]), data["keyframe"][currentkeyframe-1]["option"]["direction"]))  #Sends first yaw value (from lerp array appended two lines above) to leftright + current yaw value and in which direction to move line 77
                         currentkeyframe += 1                                            #progress to next keyframe
                         count += 1                                                      #increase count
-                    except:                     
+                    except KeyError:
                         currentkeyframe += 1                                            #catching some rare errors that dont have much impact on the animation                  
                 else:
-                    lerparray.append(data['keyframe'][currentkeyframe]["param"][key])     #if key is not yaw then add value to lerparray
+                    try:
+                        lerparray.append(data['keyframe'][currentkeyframe]["param"][key])     #if key is not yaw then add value to lerparray
+                    except KeyError:
+                        print("\nERROR #01: Varying amount of parameters. Parameter " +key+ " has to be in every keyframe. \nAnimation may not progress as planned. This error occurs for every missing parameter") #no yet
                     currentkeyframe += 1                                                #progress to next keyframe                      
                                                                                         #Do all of that untill all data from all keyframes is stored in lerparray
-            commandstring = commandstring + key + " " + str(bezier(lerparray, frame/ammountframes,key)) + " | " 
+            if len(lerparray) == 0:                       
+                print("The animation has been stopped since there are no parameters to animate.\nFor an animation you need atleast 2 keyframes with the same parameter")
+                exit()                             #If lerparray is empty
+            commandstring = commandstring + key + " " + str(round(bezier(lerparray, frame/ammountframes,key),4)) + " | " 
             if len(commandstring) > 400:                                    #command limit in magicavoxel
                 command.append(commandstring)
                 commandstring = ""
@@ -65,7 +92,7 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
         print("Frame: " + str(frame+1) + " of " + str(ammountframes))
         print("Keyframe: " + str(firstkeyframe))
         print("Last command: " + str(command))
-        #mvinput(command,float(data["keyframe"][firstkeyframe]["SecondsPerRender"])) 
+        mvinput(command,float(data["keyframe"][firstkeyframe]["option"]["secondsperrender"])) 
         
     global keyframenum
     keyframenum = keyframenum + 1
@@ -73,29 +100,15 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
         #Command data is calculated from the bezier function, and the frame is used to calculate the position on the bezier curve. For each frame.
 
 
-def leftright(c_yaw,n_yaw,c_dircetion):
-    #I WAS TOO STUPIDD TO UNUDERSTAND HOW TO NORMALIZE THE VALUE OR WHAT NORMALISATOIN EVEN IS
-
+def leftright(yaw,c_dircetion):
     c_dircetion = c_dircetion.lower()
-    if c_dircetion == "counterclockwise" or "decrease":
-        if c_yaw > 0 and n_yaw < 0:
-            n_yaw = n_yaw + 360
-        elif c_yaw < 0 and n_yaw > 0:
-            n_yaw = n_yaw - 360
-        elif c_yaw > 0 and n_yaw > 0:
-            n_yaw = n_yaw + 360
-        elif c_yaw < 0 and n_yaw < 0:
-            n_yaw = n_yaw - 360
-    elif c_dircetion == "clockwise" or "increase":
-        if c_yaw > 0 and n_yaw < 0:
-            n_yaw = n_yaw + 360
-        elif c_yaw < 0 and n_yaw > 0:
-            n_yaw = n_yaw - 360
-        elif c_yaw > 0 and n_yaw > 0:
-            n_yaw = n_yaw - 360
-        elif c_yaw < 0 and n_yaw < 0:
-            n_yaw = n_yaw + 360
-    return n_yaw
+    if c_dircetion == "clockwise":
+        yaw = normalise(yaw)
+    elif c_dircetion == "counterclockwise":
+        yaw = normaliseneg(yaw)
+    print("NEW " + str(yaw))
+
+    return yaw
 
 
 
@@ -106,7 +119,8 @@ def bezier(lerparray, frame,key):                   #get the whole lerparray the
     while count < len(lerparray)-1:                 # repeat until the lenght of lerparray is reached Why? Example: Lerparray Lenght 3 -> (1)(2)(3) Values are slowly beeing interpolated and and only 1 out 2 values are clockwise.
         newlerparray.append(float(lerp(float(lerparray[count ]), float(lerparray[count+1]), frame)))#                                      (1) (2)  Orignal set is stored in lerparray
         count += 1                                 #increase count                                                                           (1)    New values are storred in newlerparray
-                                                                                                                                #                   If count reaches 1 there is nothing to be interpolated we have reached our final value 
+    if len(newlerparray) == 0:
+        newlerparray.append(0)                                                                                                  #                   If count reaches 1 there is nothing to be interpolated we have reached our final value 
     if len(newlerparray) == 1:                     #if newlerparray is only one value clockwise then return that value                                   Lean more at https://youtu.be/aVwxzDHniEw?t=237
         return float(newlerparray[0])              #return value to previous recursion
     else:
@@ -114,6 +128,7 @@ def bezier(lerparray, frame,key):                   #get the whole lerparray the
 
 def lerp(a, b, t):
     return float(a + (b - a) * t)
+
 
 def readconfig():                                                            
     try:
@@ -170,10 +185,12 @@ def readconfig():
 def animationHandler(currentkeyframe, data):
     global atime
     if True == data['keyframe'][currentkeyframe]["animation"]["enable animation"]:
-        atime = atime + 1
         if atime == int(data['keyframe'][currentkeyframe]['animation']['endframe']):
             if data['keyframe'][currentkeyframe]['animation']["loop"] == "true":
                 atime = int(data['keyframe'][currentkeyframe]['animation']['startframe'])
+        else:
+            atime = atime + 1
+
     else:
         return ""
 
@@ -195,12 +212,17 @@ def liniar(currentkeyframe, data):
             command = []
             commandValue = ""
 
-            if bool(data["global"]['saverenders']):
+            if bool(data["global"]['saverenders']) and i != 0:
                 commandValue ="snap scene | "
+            
+            
             for key, _ in data["keyframe"][currentkeyframe]["param"].items():
-                startPos = float(data['keyframe'][currentkeyframe]["param"][key])
-                goalPos = float(data['keyframe'][currentkeyframe+1]["param"][key])
-
+                try:
+                    startPos = float(data['keyframe'][currentkeyframe]["param"][key])
+                    goalPos = float(data['keyframe'][currentkeyframe+1]["param"][key])
+                except KeyError:
+                    print("\nERROR: Parameter "+ key + " is missing in target keyframe. Parameter is being skipped.")
+                    goalPos = startPos
 
                 if key.find("ry") != -1:
                     currentDircetion = data["keyframe"][currentkeyframe]["option"]["direction"]
@@ -212,18 +234,16 @@ def liniar(currentkeyframe, data):
                         goalPos = normaliseneg(goalPos)
 
                 commandValue = commandValue + key + " " + str(round(lerp(startPos, goalPos, i/totalframeCurKeyframe),4)) + " | "
+            if "animation" in data["keyframe"][currentkeyframe]:
+                commandValue = commandValue + " " + animationHandler(currentkeyframe,data) 
             command.append(commandValue)
     
-
-            if "Animation" in data["keyframe"]:
-                atime = float(data["keyframe"][currentkeyframe]["animation"]["startframe"])
             secondPerRender = float(data['keyframe'][currentkeyframe]["option"]['secondsperrender'])
             print("Estimated time for current Keyframe: " + str(round((2+secondPerRender)*(totalframeCurKeyframe-i),2)) + " seconds")
-            print("Frame: " + str(i) + " of " + str(totalframeCurKeyframe))
-            print("Keyframe: " + str(currentkeyframe+1) + " of " + str(len(data['keyframe'])))
+            print("Frame: " + str(i) + " of " + str(totalframeCurKeyframe-1))
+            #print("Keyframe: " + str(currentkeyframe+1) + " of " + str(len(data['keyframe'])))
             #print "#" to covert the whole console width
             print("#"*(os.get_terminal_size().columns))
-
 
             mvinput(command,secondPerRender)
 
@@ -267,13 +287,23 @@ def pause(firsttime):
             while getForegroundWindowTitle():
                 time.sleep(5)              
 
+
 def main():
+    #start timer to measure how long the programm takes to run
+   
     readconfig()
+    #calucate how long the programm ran
+start_time = time.time()
+    
 
 try:
     main()
 except KeyboardInterrupt:
     print('Interrupted')
     sys.exit(0)
+
+#let console open till user closes it
+print("Finished in --- %s seconds ---" % (round(time.time() - start_time)))
+input()
 
 

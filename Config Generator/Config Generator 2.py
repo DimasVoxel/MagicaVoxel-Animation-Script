@@ -1,4 +1,3 @@
-
 import json
 import dearpygui.dearpygui as dpg
 
@@ -434,36 +433,11 @@ magicavoxel_paramters = {
 }
 
 
-
 def writeJson():
     global config
     with open('config.json', 'w') as outfile:
         json.dump(config, outfile)
 
-def main():
-    global config
-
-    fillConfig(0,"cam ry","65.9","param")
-    fillConfig(0,"frames",100,"option")
-    fillConfig(0,"direction","left","option")
-    fillConfig(0,"secondsperrender",2,"option")
-    fillConfig(0,"interpolation","linear","option")
-    fillConfig(0,"loop","true","animation")
-    fillConfig(0,"startframe","0","animation")
-    fillConfig(0,"endframe","100","animation")
-    fillConfig(1,"cam ry","65.9","param")
-    fillConfig(1,"cam rx","65.9","param")
-    fillConfig(1,"bla","123","param")
-    fillConfig(1,"frames",100,"option")
-    fillConfig(1,"direction","left","option")
-    fillConfig(1,"secondsperrender",2,"option")
-    fillConfig(1,"interpolation","linear","option")
-    fillConfig(1,"loop","true","animation")
-    fillConfig(1,"startframe","0","animation")
-    fillConfig(1,"endframe","100","animation")
-    fillConfig("","saverender","true","global")
-
-    writeJson()
 
 def readJson():
     global config
@@ -472,12 +446,6 @@ def readJson():
             config = json.load(json_file)
             #print("Config loaded")
     except: "File empty or not found"
-
-
-
-
-
-#readJson()
 
 ########################################################################################################################
 #Config functionality 
@@ -536,6 +504,8 @@ def fillConfig(keyframe,param,value,attribute):
 
     if param == "squence" or param == "frames" or param == "interpolation":
         updateTimeLine()
+    if param == "secondsperrender":
+        updateStats()
 
 
 def writeToConfig(callback,data,userdata):
@@ -575,7 +545,7 @@ def addNewTabButton(callback,data):
         if dpg.does_alias_exist("keyframe:"+nextkeyframe) == False:
             #print("Create new keyframe tab button")
             dpg.add_tab(label="keyframe: "+nextkeyframe,tag="keyframe:"+nextkeyframe,parent="keyframe_bar")
-            with dpg.child_window(autosize_x=True, height=800,parent="keyframe:"+nextkeyframe,no_scrollbar=True):
+            with dpg.child_window(width=900, height=800,parent="keyframe:"+nextkeyframe,no_scrollbar=True):
                 with dpg.group(horizontal=True, width=0):
                     with dpg.child_window(width=600, height=790):
                         with dpg.child_window(autosize_x=True,height=160):
@@ -595,9 +565,9 @@ def addNewTabButton(callback,data):
                         with dpg.child_window(autosize_x=True,height=700 ,tag="window:param:"+nextkeyframe):
                             dpg.add_text("Parameters")
                             dpg.add_separator()
-                    with dpg.child_window(width=300, height=450):
+                    with dpg.child_window(width=300, height=800,tag="window:infos:"+nextkeyframe):
                         #This is the top right window
-                        with dpg.child_window(label="Parameters",tag="window:paramselection"+nextkeyframe):
+                        with dpg.child_window(label="Parameters",tag="window:paramselection"+nextkeyframe,parent="window:infos:"+nextkeyframe,height=450):
                             with dpg.tab_bar(label="param_bar",tag="param_bar:"+nextkeyframe,parent="window:paramselection"+nextkeyframe):
                                 dpg.add_tab(label="Camera",tag="camera_tab:"+nextkeyframe,parent="param_bar:"+nextkeyframe)
                                 dpg.add_tab(label="Light",tag="light_tab:"+nextkeyframe,parent="param_bar:"+nextkeyframe)
@@ -609,6 +579,10 @@ def addNewTabButton(callback,data):
                                     #Tag = keyframe:set pt_fix_focus:0 e.g Keyframe + key + num Keyframe
                                     mvcommand = str(mvcommand)
                                     dpg.add_button(label=value["desc"],tag="light_button:"+mvcommand+":"+nextkeyframe,parent="camera_tab:"+nextkeyframe,callback=translateNewParam,user_data=(nextkeyframe,mvcommand,value,"param"))
+                        with dpg.child_window(label="Statistics",tag="window:statistics"+nextkeyframe,parent="window:infos:"+nextkeyframe,height=350):
+                            dpg.add_text("Statistics")
+                            dpg.add_separator()
+            
             if i != 0:
                 sync(i)
     updateTimeLine()
@@ -623,6 +597,7 @@ def sync(keyframe):
 
 def translateNewParam(callback,data,userdata):
     global setup
+    global config 
     #Userdata 0 = keyframe num
     #Userdata 1 = param name/key 
     #Userdata 2 = param value
@@ -659,8 +634,13 @@ def translateNewParam(callback,data,userdata):
     if keyType == "booltext":
         value = magicavoxel_paramters[paramType][paramKey]["off"]
 
-    if callback == "init" or callback == "animation" or callback == "global":
-        value = config["keyframe"][int(keyframeNum)][paramType][paramKey]
+    if callback == "init" or callback == "animation":
+        if paramType in config["keyframe"][int(keyframeNum)]:
+            value = config["keyframe"][int(keyframeNum)][paramType][paramKey]
+    if callback == "globalinit" and "global" in config:
+        if paramKey in config["global"]:
+            value = config["global"][paramKey]
+
 
     if dpg.does_alias_exist(tagKey) != True:
         fillConfig(keyframeNum,paramKey,value,paramType)
@@ -679,7 +659,7 @@ def translateNewParam(callback,data,userdata):
         elif keyType == "bool":
             with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
                 #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
-                dpg.add_checkbox(tag=tagKey,label=labelName,parent="group:"+tagKey,default_value=value,callback=writeToConfig,user_data=callbackData)
+                dpg.add_checkbox(tag=tagKey,label=labelName,parent="group:"+tagKey,default_value=bool(value),callback=writeToConfig,user_data=callbackData)
         elif keyType == "string":
             with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
                 #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
@@ -743,7 +723,7 @@ def changeText(callback,data,userdata):
 
 ########################################################################################################################
 def initialize():
-    readJson()
+   
     #print("uga")
     for i in range(len(config["keyframe"])):
         nextkeyframe = str(i)
@@ -756,24 +736,26 @@ def initialize():
                         with dpg.child_window(autosize_x=True,height=160):
                             dpg.add_text("Keyframe options")
                             dpg.add_separator()
-                            for mvcommand,value in magicavoxel_paramters["option"].items():
+                            for mvcommand,dictval in magicavoxel_paramters["option"].items():
                                 mvcommand = str(mvcommand)
-
-                                translateNewParam("init","",(nextkeyframe,mvcommand,value,"option"))
+                                value = config["keyframe"][int(nextkeyframe)]["option"][mvcommand]
+                                translateNewParam("init","",(nextkeyframe,mvcommand,dictval,"option",value))
                                 #Tag = keyframe:set pt_fix_focus:0 e.g Keyframe + key + num Keyframe
+ 
                         with dpg.child_window(autosize_x=True,height=140):
                             dpg.add_text("Keyframe Animation options")
                             dpg.add_separator()
-                            for mvcommand,value in magicavoxel_paramters["animation"].items():
+                            for mvcommand,dictvalue in magicavoxel_paramters["animation"].items():
                                 mvcommand = str(mvcommand)
-                                translateNewParam("init","",(nextkeyframe,mvcommand,value,"animation"))
+                                value = config["keyframe"][int(nextkeyframe)]["animation"][mvcommand]
+                                translateNewParam("init","",(nextkeyframe,mvcommand,dictvalue,"animation",value))
                                 #Tag = keyframe:set pt_fix_focus:0 e.g Keyframe + key + num Keyframe
                         with dpg.child_window(autosize_x=True,height=700 ,tag="window:param:"+nextkeyframe):
                             dpg.add_text("Parameters")
                             dpg.add_separator()
-                    with dpg.child_window(width=300, height=450):
+                    with dpg.child_window(width=300, height=800,tag="window:infos:"+nextkeyframe):
                         #This is the top right window
-                        with dpg.child_window(label="Parameters",tag="window:paramselection"+nextkeyframe):
+                        with dpg.child_window(label="Parameters",tag="window:paramselection"+nextkeyframe,parent="window:infos:"+nextkeyframe,height=450):
                             with dpg.tab_bar(label="param_bar",tag="param_bar:"+nextkeyframe,parent="window:paramselection"+nextkeyframe):
                                 dpg.add_tab(label="Camera",tag="camera_tab:"+nextkeyframe,parent="param_bar:"+nextkeyframe)
                                 dpg.add_tab(label="Light",tag="light_tab:"+nextkeyframe,parent="param_bar:"+nextkeyframe)
@@ -785,8 +767,12 @@ def initialize():
                                     #Tag = keyframe:set pt_fix_focus:0 e.g Keyframe + key + num Keyframe
                                     mvcommand = str(mvcommand)
                                     dpg.add_button(label=value["desc"],tag="light_button:"+mvcommand+":"+nextkeyframe,parent="camera_tab:"+nextkeyframe,callback=translateNewParam,user_data=(nextkeyframe,mvcommand,value,"param"))
-
-        
+                        with dpg.child_window(label="Statistics",tag="window:statistics"+nextkeyframe,parent="window:infos:"+nextkeyframe,height=350):
+                            dpg.add_text("Statistics")
+                            dpg.add_separator()
+                            #print("what"+nextkeyframe)
+    
+    
         for mvcommand,value in config["keyframe"][i].items():
             #print("Create new param button")
             if mvcommand == "param":
@@ -797,7 +783,7 @@ def initialize():
                         #Userdata 1 = param name/key 
                         #Userdata 2 = param value
                         #Userdata 3 = attribute
-
+    updateTimeLine()
 ########################################################################################################################
 #TimeLine  
 
@@ -824,15 +810,13 @@ def updateTimeLine():
                             startKey = keyframenum 
                             if keyframenum+1 < len(config["keyframe"])-1:
                                 if config["keyframe"][keyframenum+1]["option"]["sequence"] == True:
-                                    while keyframenum < len(config["keyframe"])-1 and config["keyframe"][keyframenum+1]["option"]["sequence"] == True:
+                                    while keyframenum <= len(config["keyframe"])-1 and config["keyframe"][keyframenum+1]["option"]["sequence"] == True:
                                         keyframenum += 1
                                         frameamount += config["keyframe"][keyframenum]["option"]["frames"]
                                         issequence = True
                                         textKey = str(startKey)+"-"+str(keyframenum)
                                         #print(keyframenum)
-                                        print(keyframenum > len(config["keyframe"])-1)
-                                        if keyframenum+1 > len(config["keyframe"])-1:
-                                            print("wetf")
+                                        if keyframenum+1 >= len(config["keyframe"])-1:
                                             break
                         else: 
                             frameamount = 0
@@ -871,7 +855,7 @@ def updateTimeLine():
             dpg.show_item("timeline")
             #if offset under 950 width = 950 if offset larger than 950 width = offset
     except KeyError:
-        print("KeyError")
+        pass
     if offset > 950:
         dpg.set_item_width("timeline",offset+200)
         dpg.set_item_width("drawlist",offset+200)
@@ -879,10 +863,52 @@ def updateTimeLine():
         dpg.set_item_width("timeline",950)
         dpg.set_item_width("drawlist",offset+200)
             #calculate bounding box
-    
+    updateStats()
+                      
+def updateStats():
+    totaltime = 0
+    try:
+        for i in range(len(config["keyframe"])):
+            if "secondsperrender" in config["keyframe"][i]["option"]:
+                totaltime = round((config["keyframe"][i]["option"]["frames"]*(config["keyframe"][i]["option"]["secondsperrender"]+2))/60 + totaltime)
+            else:
+                return 
+        for i in range(len(config["keyframe"])):
+            #print("yes"+str(i))
+            if dpg.does_alias_exist("statistics_group:"+str(i)) == True:
+                dpg.delete_item("statistics_group:"+str(i))
+            with dpg.group(tag="statistics_group:"+str(i),parent="window:statistics"+str(i)):
+                dpg.add_text("Keyframe: "+str(i))
+                dpg.add_text("Frames: "+str(config["keyframe"][i]["option"]["frames"]))
+                dpg.add_text("Interpolation: "+str(config["keyframe"][i]["option"]["interpolation"]))
+                dpg.add_text("In Sequence: "+str(config["keyframe"][i]["option"]["sequence"]))
+                estimate = round((config["keyframe"][i]["option"]["frames"]*(config["keyframe"][i]["option"]["secondsperrender"]+2))/60)
+                dpg.add_text("Keyframe rendertime: "+str(estimate) + " minutes")
+                dpg.add_separator()
+                dpg.add_text("Total animation time: "+str(totaltime)+" minutes")
+                dpg.add_separator()
+    except KeyError:
+        pass
+  #        params = []
+  #        lenght = []
+  #        for keyframe in range(len(config["keyframe"])):
+  #            params = []
+  #            for param,value in config["keyframe"][keyframe]["param"].items():
+  #                if param not in params:
+  #                    params.append(param)
+  #                    lenght.append(len(param))
+  #        if 
+  #        dpg.add_text("Parameters:"+str(lenght[i]))
+  #        print(params)
 
 ########################################################################################################################
+#help
+def gethelp(callback,data):
+    with dpg.window(label="Help",tag="help",width=200,height=400):
+        dpg.add_text("How does this work?")
 
+
+########################################################################################################################
 dpg.create_context()
 
 #look for trash.png in the same directory as this script and in ui folder
@@ -897,10 +923,15 @@ dpg.create_context()
 #      print("script was looking for in:"+path)
 #      print("Ui not found, make sure the ui folder is in the same directory as this script")
 #      exit()
+readJson()
 
 with dpg.viewport_menu_bar():
-    with dpg.menu(label="File"):
+    with dpg.menu(label="SAVE"):
         dpg.add_menu_item(label="Save",callback=writeJson)
+    #with dpg.menu(label="HELP"):
+    #    dpg.add_menu_item(label="What am I doing?",callback=gethelp)
+
+
 
 
 with dpg.window(tag="Primary Window",label="Config Generator",menubar=True):
@@ -910,7 +941,7 @@ with dpg.window(tag="Primary Window",label="Config Generator",menubar=True):
         dpg.add_separator()
         for mvcommand,value in magicavoxel_paramters["global"].items():
             mvcommand = str(mvcommand)
-            translateNewParam("","",("",mvcommand,value,"global"))
+            translateNewParam("globalinit","",("",mvcommand,value,"global"))
     with dpg.child_window(tag="Second Window",parent="Primary Window",height=750,no_scrollbar=True):
         with dpg.tab_bar(label="keyframe_bar",tag="keyframe_bar"):    
             dpg.add_tab_button(label="+",tag="add",trailing=True,callback=addNewTabButton)
@@ -919,8 +950,8 @@ with dpg.window(tag="Primary Window",label="Config Generator",menubar=True):
         dpg.add_text("Timeline")
         dpg.add_separator()
     
-
-initialize()
+if config["keyframe"] != []:
+    initialize()
 
 
 #dpg.show_documentation()
