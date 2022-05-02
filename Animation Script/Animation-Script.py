@@ -1,5 +1,6 @@
 from time import process_time_ns, thread_time_ns
 from ctypes import wintypes, windll, create_unicode_buffer
+from typing import Optional
 import pyperclip
 import pydirectinput as pydi
 import time
@@ -10,7 +11,7 @@ import os
 global atime
 atime = int(0)
 
-def getForegroundWindowTitle() -> Optional[str]:            #Get current active Window
+def getForegroundWindowTitle() -> Optional[str]:
     hWnd = windll.user32.GetForegroundWindow()
     length = windll.user32.GetWindowTextLengthW(hWnd)
     buf = create_unicode_buffer(length + 1)
@@ -20,9 +21,6 @@ def getForegroundWindowTitle() -> Optional[str]:            #Get current active 
     else:
         return True
 
-
-def getForegroundWindowTitle():
-    return False
 
 def exitprog():
     input('Press Enter to continue...')
