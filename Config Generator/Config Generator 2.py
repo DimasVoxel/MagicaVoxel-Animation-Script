@@ -379,10 +379,11 @@ magicavoxel_paramters = {
             "default":10
         },
         "direction":{
-            "desc":"Animation direction - Clockwise / Anticlockwise",
+            "desc":"Animation direction - Clockwise / Counterclockwise",
             "optionType":"booltext",
+            "tooltip":"This only applies for camera yaw",
             "on":"clockwise",
-            "off":"anticlockwise"
+            "off":"counterclockwise"
         },
         "interpolation": {
             "desc":"Interpolation for camera path - linear/bezier",
