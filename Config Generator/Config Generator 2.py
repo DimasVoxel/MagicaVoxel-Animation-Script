@@ -58,17 +58,11 @@ magicavoxel_paramters = {
             "min":"-10000",
             "max":"10000"
         },
-        "set pt_dof":{
+        "set pt_fix_focus 1 | set pt_dof":{
             "desc":"Aperture",
             "optionType":"float",
             "min":"0",
             "max":"1"
-        },
-        "set pt_fix_focus":{
-            "desc":"Focus",
-            "optionType":"float",
-            "min":"0",
-            "max":"9999"
         },
         "set pt_blade_rot":{
             "desc":"Blade Rotation",
@@ -236,17 +230,11 @@ magicavoxel_paramters = {
             "min":"-10000",
             "max":"10000"
         },
-        "set pt_dof":{
+        "set pt_fix_focus 1 | set pt_dof":{
             "desc":"Aperture",
             "optionType":"float",
             "min":"0",
             "max":"1"
-        },
-        "set pt_fix_focus":{
-            "desc":"Focus",
-            "optionType":"float",
-            "min":"0",
-            "max":"9999"
         },
         "set pt_blade_rot":{
             "desc":"Blade Rotation",

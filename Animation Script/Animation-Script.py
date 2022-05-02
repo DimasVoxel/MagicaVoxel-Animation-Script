@@ -44,7 +44,7 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
     if isdupicate == False:
         print('The animation has been stopped since there are no parameters to animate.\nFor an animation you need atleast 2 keyframes with the same parameter')
         print('Skipping Keyframes: '+str(firstkeyframe)+' to '+str(lastkeyframe))
-        #break
+        return
     
     for frame in range(ammountframes):                                                    
         command = []   
