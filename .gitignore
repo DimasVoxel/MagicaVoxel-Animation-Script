@@ -31,3 +31,23 @@ Animation Script/build/Animation-Script/Tree-02.toc
 Animation Script/build/Animation-Script/warn-Animation-Script.txt
 Animation Script/build/Animation-Script/xref-Animation-Script.html
 Animation Script/dist/Animation-Script.exe
+.vscode/launch.json
+Config Generator/config.json
+Animation Script/config.json
+Config Generator/dist/config.json
+.gitignore
+Config Generator/build/Animation-Script/Analysis-00.toc
+Config Generator/build/Animation-Script/Animation-Script.exe.manifest
+Config Generator/build/Animation-Script/Animation-Script.pkg
+Config Generator/build/Animation-Script/base_library.zip
+Config Generator/build/Animation-Script/EXE-00.toc
+Config Generator/build/Animation-Script/PKG-00.toc
+Config Generator/build/Animation-Script/PYZ-00.pyz
+Config Generator/build/Animation-Script/PYZ-00.toc
+Config Generator/build/Animation-Script/Tree-00.toc
+Config Generator/build/Animation-Script/Tree-01.toc
+Config Generator/build/Animation-Script/Tree-02.toc
+Config Generator/build/Animation-Script/warn-Animation-Script.txt
+Config Generator/build/Animation-Script/xref-Animation-Script.html
+Config Generator/Animation-Script.spec
+.DS_Store
