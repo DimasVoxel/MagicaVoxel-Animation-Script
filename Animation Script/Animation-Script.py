@@ -44,7 +44,8 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
         print('Skipping Keyframes: '+str(firstkeyframe)+' to '+str(lastkeyframe))
         return
     
-    for frame in range(ammountframes):                                                    
+    for frame in range(ammountframes):       
+        starttime = time.time()                                              
         command = []   
         commandstring = ' '                          
         if bool(data['global']['saverenders']) == True and frame != 0:
@@ -69,11 +70,22 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
                 command.append(commandstring)
                 commandstring = ''
         commandstring = commandstring + ' ' + animationHandler(firstkeyframe,data) 
-        command.append(commandstring)              
+        command.append(commandstring)     
+
+        print('#'*(os.get_terminal_size().columns))
+        print('\nLast command: ' + str(command))
         print('Frame: ' + str(frame+1) + ' of ' + str(ammountframes))
-        print('Keyframe: ' + str(firstkeyframe))
-        print('Last command: ' + str(command))
         mvinput(command,float(data['keyframe'][firstkeyframe]['option']['secondsperrender'])) 
+
+        #endtimer
+        endtime = time.time()
+
+
+        print('\nTime taken: ' + str(round(endtime - starttime,2)) + ' seconds')
+        #estimate time left time x frames 
+        print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame),2)) + ' seconds')
+        print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame)/60,2)) + ' minutes')
+        print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame) / 3600,2)) + ' hours')
 
 def beznormalise(yaw,c_dircetion):
     c_dircetion = c_dircetion.lower()
@@ -111,6 +123,10 @@ def readconfig():
         print('Common issues: you wrote true or false with an uppercaseletter or you got a typo somewhere')
         exitprog()
 
+    if data['version'] == '1.0':
+        print("Your config file is outdated. Please generate a new one.")
+        exitprog()
+
     print('Please open MagicaVoxel and make sure its in the foreground.')
     pause(True)                                            #Wait until window in Active to start script we dont want the script spamming your discord for 
     interpolation = []
@@ -119,9 +135,9 @@ def readconfig():
         try:                                                   
             if keyframe['option']['interpolation'] == 'linear':
                 interpolation.append('linear')
-            elif keyframe['option']['interpolation'] == 'bezier' and not  keyframe['option']['sequence']:
+            elif keyframe['option']['interpolation'] == 'bezier':
                 interpolation.append('bezier')
-            elif keyframe['option']['interpolation'] == 'bezier' and keyframe['option']['sequence']:
+            elif keyframe['option']['interpolation'] == 'bezier-sequence':
                 interpolation.append('sequence')
         except:                                                 
             interpolation.append('1')                                           
