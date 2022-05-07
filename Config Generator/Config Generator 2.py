@@ -688,6 +688,7 @@ def translateNewParam(callback,data,userdata):
 
 
 ########################################################################################################################
+#main
 def rebuild():
     global config
     global tabpos
@@ -702,7 +703,6 @@ def rebuild():
         dpg.add_tab_button(label="+",tag="add",trailing=True,callback=addNewTabButton)
         dpg.add_tab_button(label="-",tag="remove",trailing=True,callback=deleteTabButton)
     
-    #print("uga")
     for i in range(len(config["keyframe"])):
         if len(tabpos) > i and len(tabpos) != 0:
             intnextkeyframe = tabpos[i][1]
@@ -908,7 +908,7 @@ def updateStats():
             if dpg.does_alias_exist("statistics_group:"+str(keyframenum)) == True:
                 dpg.delete_item("statistics_group:"+str(keyframenum))
                 
-            print(str(keyframenum))
+            #print(str(keyframenum))
 
             with dpg.group(tag="statistics_group:"+str(keyframenum),parent="window:statistics"+str(keyframenum)):
                 dpg.add_text("Keyframe: "+str(keyframenum),parent="statistics_group"+str(keyframenum))
