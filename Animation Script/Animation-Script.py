@@ -162,7 +162,7 @@ def animationHandler(currentkeyframe, data):
     global atime
     if True == data['keyframe'][currentkeyframe]['animation']['enable animation']:
         if atime == int(data['keyframe'][currentkeyframe]['animation']['endframe']):
-            if data['keyframe'][currentkeyframe]['animation']['loop'] == 'true':
+            if data['keyframe'][currentkeyframe]['animation']['loop'] == True:
                 atime = int(data['keyframe'][currentkeyframe]['animation']['startframe'])
         else:
             atime = atime + 1
@@ -215,7 +215,7 @@ def liniar(currentkeyframe, data):
             print('Frame: ' + str(i) + ' of ' + str(totalframeCurKeyframe-1))
             print('#'*(os.get_terminal_size().columns))
 
-            mvinput(command,secondPerRender)
+            #mvinput(command,secondPerRender)
 
     except ValueError:
         print('Error in config. Did you accidentally input a letter instead of a number?')
