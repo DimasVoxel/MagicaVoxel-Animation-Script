@@ -181,7 +181,9 @@ def liniar(currentkeyframe, data):
         totalframeCurKeyframe = int(data['keyframe'][currentkeyframe]['option']['frames'])
         global atime
         
-        for i in range(0, totalframeCurKeyframe):                                 
+        for i in range(0, totalframeCurKeyframe):                         
+            #starttimer
+            starttime = time.time()       
             command = []
             commandValue = ''
 
@@ -211,11 +213,24 @@ def liniar(currentkeyframe, data):
             command.append(commandValue)
     
             secondPerRender = float(data['keyframe'][currentkeyframe]['option']['secondsperrender'])
-            print('Estimated time for current Keyframe: ' + str(round((2+secondPerRender)*(totalframeCurKeyframe-i),2)) + ' seconds')
+
+            #endtimer
+
             print('Frame: ' + str(i) + ' of ' + str(totalframeCurKeyframe-1))
+
+
+            mvinput(command,secondPerRender)
+
+            endtime = time.time()
+
+            print('\nTime taken: ' + str(round(endtime - starttime,2)) + ' seconds')
+            #estimate time left time x frames 
+            print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i),2)) + ' seconds')
+            print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i)/60,2)) + ' minutes')
+            print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i) / 3600,2)) + ' hours\n')
             print('#'*(os.get_terminal_size().columns))
 
-            #mvinput(command,secondPerRender)
+
 
     except ValueError:
         print('Error in config. Did you accidentally input a letter instead of a number?')
