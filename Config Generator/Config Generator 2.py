@@ -1,6 +1,5 @@
 from copy import deepcopy
 import json
-from time import sleep
 import dearpygui.dearpygui as dpg
 
 global config 
@@ -10,6 +9,7 @@ global setup
 setup =False
 global tabpos
 tabpos = {}
+configVersion = 3
 
 global magicavoxel_parameters
 magicavoxel_paramters = { 
@@ -382,18 +382,18 @@ magicavoxel_paramters = {
             "max":"1000000",
             "default":10
         },
+        "interpolation": {
+            "desc":"Interpolation for camera path - linear/bezier",
+            "optionType":"select",
+            "options":["linear","bezier","bezier-sequence"],
+            "default":"linear"
+        },
         "direction":{
             "desc":"Animation direction - Clockwise / Counterclockwise",
             "optionType":"select",
             "tooltip":"This only applies for camera yaw",
             "options":["Clockwise","Counterclockwise"],
             "default":"Clockwise"
-        },
-        "interpolation": {
-            "desc":"Interpolation for camera path - linear/bezier",
-            "optionType":"select",
-            "options":["linear","bezier","bezier-sequence"],
-            "default":"linear"
         },
     },
     "global": {
@@ -451,16 +451,20 @@ def writeJson():
         if tabpos[i][1] != i:
             config["keyframe"][i],config["keyframe"][tabpos[i][1]] = configbak["keyframe"][tabpos[i][1]],configbak["keyframe"][i]
 
+
     config["version"] = {}
-    config["version"] = "1"
+    config["version"] = configVersion
 
     with open('config.json', 'w') as outfile:
         json.dump(config, outfile)
 
     if dpg.does_item_exist("keyframe_bar") == True:
         dpg.delete_item("keyframe_bar")
-    rebuild()
 
+    config = {}
+    config["keyframe"] = []
+    readJson()
+    rebuild()
 
 
 def readJson():
@@ -558,31 +562,37 @@ def writeToConfig(callback,data,userdata):
 #Tab functionality 
 
 def tabOrder():
-    global config
-    global tabpos
-    tabpos = {}
-    count = 0
     if dpg.does_item_exist("keyframe_bar") == True:
+        global config
+        global tabpos
+        tabpos = {}
+        count = 0
         info = dpg.get_item_info("keyframe_bar")
         for child in info["children"][1]:
             if "keyframe" in dpg.get_item_alias(child):
-                #print(dpg.get_item_rect_max(child))
                 pos = dpg.get_item_rect_max(child)
                 tag = dpg.get_item_alias(child)
                 tag = tag.replace("keyframe:","")
                 tabpos[pos[0]] = int(tag)
 
         tabpos = sorted(tabpos.items())
-    
+
 
 def deleteTabButton(callback,data,userdata):
     global config
-    keyframeTotalAmount = len(config["keyframe"])-1         #len starts counting from 1 instead of 0 
-    deleteKeyframe = "keyframe:"+str(keyframeTotalAmount)  #keyframe + last keyframe number = keyframe:1 
+    try:
+        KeyFrameNum = len(config["keyframe"])-1         #len starts counting from 1 instead of 0 
+        deleteKeyframe = "keyframe:"+str(KeyFrameNum)  #keyframe + last keyframe number = keyframe:1 
+    except TypeError:
+        pass
+    #else:
+     #   deleteKeyframe = userdata[0]
+     #   KeyFrameNum = userdata[1]
+    
     #print("Delete keyframe: " + deleteKeyframe)
     if dpg.does_alias_exist(deleteKeyframe) == True:
         dpg.delete_item(deleteKeyframe)
-        removeConfig(keyframeTotalAmount,"","keyframe")
+        removeConfig(KeyFrameNum,"","keyframe")
 
 def addNewTabButton(callback,data):
     global config
@@ -592,8 +602,11 @@ def addNewTabButton(callback,data):
         #print("Add new keyframe: " + "keyframe:0")
     else:
         fillConfig(len(config["keyframe"]),"","","keyframe")  
-            
+
     rebuild()
+    newtab = "keyframe:"+str(len(config["keyframe"])-1)
+    dpg.set_value("keyframe_bar",newtab)
+    
     updateTimeLine()
 
 def sync(keyframe):
@@ -693,8 +706,9 @@ def rebuild():
     global config
     global tabpos
     currenttab = ""
-    tabOrder()
+
     if dpg.does_item_exist("keyframe_bar") == True:
+        tabOrder()
         currenttab = dpg.get_value("keyframe_bar")
         dpg.delete_item("keyframe_bar")
    
@@ -716,6 +730,11 @@ def rebuild():
         if dpg.does_alias_exist("keyframe:"+strnextkeyframe) == False:
             #print("Create new keyframe tab button")
             dpg.add_tab(label=strnextkeyframe+" Keyframe",tag="keyframe:"+strnextkeyframe,parent="keyframe_bar",track_offset=True,tracked=True)
+            #with dpg.popup(tag="tooltip:"+"keyframe:"+strnextkeyframe,parent="keyframe:"+strnextkeyframe,modal=True):
+            #    dpg.add_text("Options")
+            #    dpg.add_separator()
+            #    dpg.add_button(label="Delete",callback=deleteTabButton,user_data="keyframe:"+strnextkeyframe)
+            #   # dpg.add_button("Copy",callback=copyKeyframeButton,user_data=("keyframe:"+strnextkeyframe))
             with dpg.child_window(width=900, height=800,parent="keyframe:"+strnextkeyframe,no_scrollbar=True):
                 with dpg.group(horizontal=True, width=0):
                     with dpg.child_window(width=600, height=790):
@@ -758,7 +777,7 @@ def rebuild():
                                     #Tag = keyframe:set pt_fix_focus:0 e.g Keyframe + key + num Keyframe
                                     mvcommand = str(mvcommand)
                                     dpg.add_button(label=value["desc"],tag="light_button:"+mvcommand+":"+strnextkeyframe,parent="camera_tab:"+strnextkeyframe,callback=translateNewParam,user_data=(intnextkeyframe,mvcommand,value,"param"))
-                        with dpg.child_window(label="Statistics",tag="window:statistics"+strnextkeyframe,parent="window:infos:"+strnextkeyframe,height=350):
+                        with dpg.child_window(label="Statistics",tag="window:statistics:"+strnextkeyframe,parent="window:infos:"+strnextkeyframe,height=350):
                             dpg.add_text("Statistics")
                             dpg.add_separator()
                             #print("what"+nextkeyframe)
@@ -775,12 +794,14 @@ def rebuild():
                         #Userdata 2 = param value
                         #Userdata 3 = attribute
     
-        #if intnextkeyframe != 0:
-        #    sync(intnextkeyframe)
+        if intnextkeyframe != 0:
+            sync(intnextkeyframe)
     #print(currenttab)
     if dpg.does_item_exist(currenttab) == True:
         #print("Set current tab to: "+currenttab)
         dpg.set_value("keyframe_bar",currenttab)
+
+    updateStats()
 
 ########################################################################################################################
 #TimeLine  
@@ -904,27 +925,34 @@ def updateStats():
                 issequence = "True"
             else:
                 issequence = "False"
-           
+
+            print("window:statistics:"+str(keyframenum)+"  "+str(dpg.does_item_exist("window:statistics:"+str(keyframenum))))
+            if dpg.does_item_exist("window:statistics:"+str(keyframenum)) == False:
+                break
+
             if dpg.does_alias_exist("statistics_group:"+str(keyframenum)) == True:
                 dpg.delete_item("statistics_group:"+str(keyframenum))
                 
             #print(str(keyframenum))
 
-            with dpg.group(tag="statistics_group:"+str(keyframenum),parent="window:statistics"+str(keyframenum)):
-                dpg.add_text("Keyframe: "+str(keyframenum),parent="statistics_group"+str(keyframenum))
-                dpg.add_text("Frames: "+str(config["keyframe"][keyframenum]["option"]["frames"]),parent="statistics_group"+str(keyframenum))
-                if config["keyframe"][i]["option"]["interpolation"] == "bezier-sequence":
+
+            with dpg.group(tag="statistics_group:"+str(keyframenum),parent="window:statistics:"+str(keyframenum)):
+                dpg.add_text("Keyframe: "+str(keyframenum),parent="statistics_group:"+str(keyframenum))
+                dpg.add_text("Frames: "+str(config["keyframe"][keyframenum]["option"]["frames"]),parent="statistics_group:"+str(keyframenum))
+                if config["keyframe"][keyframenum]["option"]["interpolation"] == "bezier-sequence":
                     issequence = "True"
                 else:
-                    dpg.add_text("Interpolation: "+str(config["keyframe"][keyframenum]["option"]["interpolation"]),parent="statistics_group"+str(keyframenum))
+                    dpg.add_text("Interpolation: "+str(config["keyframe"][keyframenum]["option"]["interpolation"]),parent="statistics_group:"+str(keyframenum))
                     issequence = "False"
                 
-                dpg.add_text("In Sequence: "+ issequence,parent="statistics_group"+str(keyframenum))
+                dpg.add_text("In Sequence: "+ issequence,parent="statistics_group:"+str(keyframenum))
                 estimate = round((config["keyframe"][keyframenum]["option"]["frames"]*(config["keyframe"][keyframenum]["option"]["secondsperrender"]+2))/60)
-                dpg.add_text("Keyframe rendertime: "+str(estimate) + " minutes",parent="statistics_group"+str(keyframenum))
-                dpg.add_separator(parent="statistics_group"+str(keyframenum))
-                dpg.add_text("Total animation time: "+str(totaltime)+" minutes",parent="statistics_group"+str(keyframenum))
-                dpg.add_separator(parent="statistics_group"+str(keyframenum))
+                dpg.add_text("Keyframe rendertime: "+str(estimate) + " minutes",parent="statistics_group:"+str(keyframenum))
+                dpg.add_separator(parent="statistics_group:"+str(keyframenum))
+                dpg.add_text("Total animation time: "+str(totaltime)+" minutes",parent="statistics_group:"+str(keyframenum))
+                dpg.add_separator(parent="statistics_group:"+str(keyframenum))
+
+
     except KeyError:
         pass
   #        params = []
@@ -965,7 +993,9 @@ dpg.create_context()
 #      print("Ui not found, make sure the ui folder is in the same directory as this script")
 #      exit()
 readJson()
-
+if config["version"] != configVersion:
+    config = {}
+    config["keyframe"] = []
 
 
 with dpg.viewport_menu_bar():
