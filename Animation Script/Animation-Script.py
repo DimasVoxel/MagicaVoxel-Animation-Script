@@ -54,16 +54,11 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
         for i in range(len(params)):                 
             key = params[i]
             lerparray = []                                                                                                                         
-            for keyframe in range(firstkeyframe, lastkeyframe+1):                        
-                if key.find('ry') != -1:                                                                                               
-                    try:         
-                        value = float(data['keyframe'][keyframe]['param']['cam ry'])   
-                        direction = data['keyframe'][keyframe]['option']['direction']                                                                           
-                        lerparray.append(beznormalise(value,direction))                                  
-                    except KeyError:
-                        pass         
-                elif key in data['keyframe'][keyframe]['param']:
+            for keyframe in range(firstkeyframe, lastkeyframe+1):                               
+                if key in data['keyframe'][keyframe]['param']:
                     lerparray.append(data['keyframe'][keyframe]['param'][key]) 
+            if key.find('ry') != -1:
+                lerparray = beznormalise(lerparray,firstkeyframe,lastkeyframe,data)
 
             commandstring = commandstring + key + ' ' + str(round(bezier(lerparray, frame/ammountframes,key),4)) + ' | ' 
             if len(commandstring) > 400:                                   
@@ -87,13 +82,34 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
         print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame)/60,2)) + ' minutes')
         print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame) / 3600,2)) + ' hours')
 
-def beznormalise(yaw,c_dircetion):
-    c_dircetion = c_dircetion.lower()
-    if c_dircetion == 'clockwise':
-        return normalise(yaw)
-    elif c_dircetion == 'counterclockwise':
-        return normaliseneg(yaw)
-    return 0
+def beznormalise(lerparray,firstkeyframe,lastkeyframe,data):
+    newlerparray = []
+    newlerparray.append(lerparray[0])
+    for i in range(firstkeyframe,lastkeyframe):
+        p_yaw = newlerparray[i]
+        n_yaw = data["keyframe"][i+1]["param"]["cam ry"]
+
+
+        if data["keyframe"][i]["option"]["direction"] == "Clockwise":
+            if n_yaw > p_yaw:
+                newlerparray.append(newlerparray[i]+(n_yaw-p_yaw))
+            if n_yaw < p_yaw:
+                while n_yaw < p_yaw:
+                    n_yaw = n_yaw + 360
+                newlerparray.append(newlerparray[i]+(n_yaw-p_yaw))
+        if data["keyframe"][i]["option"]["direction"] == "Counterclockwise":
+            if n_yaw < p_yaw:
+                newlerparray.append(newlerparray[i]+(n_yaw-p_yaw))
+            if n_yaw > p_yaw:
+                while n_yaw > p_yaw:
+                    n_yaw = n_yaw - 360
+                newlerparray.append(newlerparray[i]+(n_yaw-p_yaw))
+
+
+    return newlerparray
+
+
+
 
 def bezier(lerparray, frame,key):                                                                     
     newlerparray = []
@@ -123,7 +139,7 @@ def readconfig():
         print('Common issues: you wrote true or false with an uppercaseletter or you got a typo somewhere')
         exitprog()
 
-    if data['version'] == '1.0':
+    if data['version'] == '3':
         print("Your config file is outdated. Please generate a new one.")
         exitprog()
 
@@ -248,9 +264,18 @@ def mvinput(command,secondPerRender):
         pydi.keyUp('ctrl')
         time.sleep(0.2) 
         pydi.press('enter')
-        if bool(data['global']['saverenders']):         
+        if bool(data['global']['saverenders']) == True:         
             time.sleep(0.2)
             pydi.press('enter')
+        else:
+            time.sleep(0.2)
+            pydi.press('f1')
+
+        #check if "snap" is in the string of command
+        if command[i].find('snap') == -1:
+            time.sleep(0.2)
+            pydi.press('f1')
+            print("ahahahaha")
     time.sleep(secondPerRender)              
 
     
