@@ -1,7 +1,6 @@
 from time import process_time_ns, thread_time_ns
 from ctypes import wintypes, windll, create_unicode_buffer
 from typing import Optional
-import pyperclip
 import pydirectinput as pydi
 import time
 import json
