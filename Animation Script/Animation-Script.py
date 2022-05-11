@@ -135,8 +135,7 @@ def readconfig():
             data = json.load(json_file)                    #Write Json to var
         json_file.close()                                  #Close Json file
     except:                                                #If json not found error
-        print('ERROR: You either dont have a camara.json in this folder or you made a mistake.')
-        print('Common issues: you wrote true or false with an uppercaseletter or you got a typo somewhere')
+        print('ERROR: No config.json in this folder.')
         exitprog()
 
     if data['version'] == '3':
