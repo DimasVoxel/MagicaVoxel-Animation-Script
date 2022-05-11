@@ -10,6 +10,7 @@ import os
 
 global atime
 atime = int(0)
+pydi.PAUSE = 0.01
 
 def getForegroundWindowTitle() -> Optional[str]:
     hWnd = windll.user32.GetForegroundWindow()
@@ -254,15 +255,12 @@ def liniar(currentkeyframe, data):
 
     #print('Keyframe: ' + str(currentkeyframe+2) + ' of ' + str(len(data['keyframe'])))
 
-def mvinput(command,secondPerRender):
-    for i in range(len(command)):
-        pydi.press('f1') 
-        pause(False) 
-        pyperclip.copy(command[i])  
-        pydi.keyDown('ctrl')
-        pydi.press('v')
-        pydi.keyUp('ctrl')
-        time.sleep(0.2) 
+def mvinput(commands, secondPerRender):
+    for cmd in commands:
+        pause(False)
+        pydi.press('f2')
+        pydi.typewrite(cmd)
+        time.sleep(0.1)
         pydi.press('enter')
         if bool(data['global']['saverenders']) == True:         
             time.sleep(0.2)
