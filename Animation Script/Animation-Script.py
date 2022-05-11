@@ -1,6 +1,7 @@
 from time import process_time_ns, thread_time_ns
 from ctypes import wintypes, windll, create_unicode_buffer
 from typing import Optional
+import pyperclip
 import pydirectinput as pydi
 import time
 import json
@@ -43,41 +44,41 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
         print('The animation has been stopped since there are no parameters to animate.\nFor an animation you need atleast 2 keyframes with the same parameter')
         print('Skipping Keyframes: '+str(firstkeyframe)+' to '+str(lastkeyframe))
         return
-
-    for frame in range(ammountframes):
-        starttime = time.time()
-        command = []
-        commandstring = ' '
+    
+    for frame in range(ammountframes):       
+        starttime = time.time()                                              
+        command = []   
+        commandstring = ' '                          
         if bool(data['global']['saverenders']) == True and frame != 0:
-            commandstring ='snap scene | '
+            commandstring ='snap scene | '    
 
-        for i in range(len(params)):
+        for i in range(len(params)):                 
             key = params[i]
-            lerparray = []
-            for keyframe in range(firstkeyframe, lastkeyframe+1):
+            lerparray = []                                                                                                                         
+            for keyframe in range(firstkeyframe, lastkeyframe+1):                               
                 if key in data['keyframe'][keyframe]['param']:
-                    lerparray.append(data['keyframe'][keyframe]['param'][key])
+                    lerparray.append(data['keyframe'][keyframe]['param'][key]) 
             if key.find('ry') != -1:
                 lerparray = beznormalise(lerparray,firstkeyframe,lastkeyframe,data)
 
-            commandstring = commandstring + key + ' ' + str(round(bezier(lerparray, frame/ammountframes,key),4)) + ' | '
-            if len(commandstring) > 400:
+            commandstring = commandstring + key + ' ' + str(round(bezier(lerparray, frame/ammountframes,key),4)) + ' | ' 
+            if len(commandstring) > 400:                                   
                 command.append(commandstring)
                 commandstring = ''
-        commandstring = commandstring + ' ' + animationHandler(firstkeyframe,data)
-        command.append(commandstring)
+        commandstring = commandstring + ' ' + animationHandler(firstkeyframe,data) 
+        command.append(commandstring)     
 
         print('#'*(os.get_terminal_size().columns))
         print('\nLast command: ' + str(command))
         print('Frame: ' + str(frame+1) + ' of ' + str(ammountframes))
-        mvinput(command,float(data['keyframe'][firstkeyframe]['option']['secondsperrender']))
+        mvinput(command,float(data['keyframe'][firstkeyframe]['option']['secondsperrender'])) 
 
         #endtimer
         endtime = time.time()
 
 
         print('\nTime taken: ' + str(round(endtime - starttime,2)) + ' seconds')
-        #estimate time left time x frames
+        #estimate time left time x frames 
         print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame),2)) + ' seconds')
         print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame)/60,2)) + ' minutes')
         print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame) / 3600,2)) + ' hours')
@@ -111,26 +112,26 @@ def beznormalise(lerparray,firstkeyframe,lastkeyframe,data):
 
 
 
-def bezier(lerparray, frame,key):
+def bezier(lerparray, frame,key):                                                                     
     newlerparray = []
-    while len(lerparray) > 1:
-        for i in range(len(lerparray)-1):
-            newlerparray.append(float(lerp(lerparray[i],lerparray[i+1],frame)))
+    while len(lerparray) > 1:      
+        for i in range(len(lerparray)-1): 
+            newlerparray.append(float(lerp(lerparray[i],lerparray[i+1],frame)))                                                                                                                                 
         if len(newlerparray) == 0:
-            newlerparray.append(0)
-        if len(newlerparray) == 1:
-            return float(newlerparray[0])
+            newlerparray.append(0)                                                                                                  
+        if len(newlerparray) == 1:                           
+            return float(newlerparray[0])             
         else:
             lerparray = newlerparray
-            newlerparray = []
+            newlerparray = [] 
 
 def lerp(a, b, t):
     return float(a + (b - a) * t)
 
 
-def readconfig():
+def readconfig():                                                            
     try:
-        global data
+        global data 
         with open('config.json') as json_file:             #Load Json file
             data = json.load(json_file)                    #Write Json to var
         json_file.close()                                  #Close Json file
@@ -144,33 +145,33 @@ def readconfig():
         exitprog()
 
     print('Please open MagicaVoxel and make sure its in the foreground.')
-    pause(True)                                            #Wait until window in Active to start script we dont want the script spamming your discord for
+    pause(True)                                            #Wait until window in Active to start script we dont want the script spamming your discord for 
     interpolation = []
 
     for keyframe in data['keyframe']:
-        try:
+        try:                                                   
             if keyframe['option']['interpolation'] == 'linear':
                 interpolation.append('linear')
             elif keyframe['option']['interpolation'] == 'bezier':
                 interpolation.append('bezier')
             elif keyframe['option']['interpolation'] == 'bezier-sequence':
                 interpolation.append('sequence')
-        except:
-            interpolation.append('1')
-
-    for i in range(len(data['keyframe'])-1):
-        if interpolation[i] == 'linear':
-            liniar(i, data)
+        except:                                                 
+            interpolation.append('1')                                           
+            
+    for i in range(len(data['keyframe'])-1):                    
+        if interpolation[i] == 'linear':  
+            liniar(i, data)               
         elif interpolation[i] == 'bezier':
-            ammountframes = int(data['keyframe'][i]['option']['frames'])
+            ammountframes = int(data['keyframe'][i]['option']['frames']) 
             for j in range(i+1,len(data['keyframe'])-1):
                 if interpolation[j] == 'sequence':
-                    ammountframes = int(data['keyframe'][j]['option']['frames'])+ammountframes
+                    ammountframes = int(data['keyframe'][j]['option']['frames'])+ammountframes  
                 else:
                     break
-            beziersetup(i, j+1, data, ammountframes)
-
-
+            beziersetup(i, j+1, data, ammountframes)  
+                    
+            
 
 
 
@@ -184,7 +185,7 @@ def animationHandler(currentkeyframe, data):
             atime = atime + 1
     else:
         return ''
-    return 'set a_time '+ str(int(atime)) + ' | '
+    return 'set a_time '+ str(int(atime)) + ' | ' 
 
 def normalise(val):
     return (val % 360 + 360) % 360
@@ -196,16 +197,16 @@ def liniar(currentkeyframe, data):
     try:
         totalframeCurKeyframe = int(data['keyframe'][currentkeyframe]['option']['frames'])
         global atime
-
-        for i in range(0, totalframeCurKeyframe):
+        
+        for i in range(0, totalframeCurKeyframe):                         
             #starttimer
-            starttime = time.time()
+            starttime = time.time()       
             command = []
             commandValue = ''
 
             if bool(data['global']['saverenders']) and i != 0:
                 commandValue ='snap scene | '
-
+            
             for key, _ in data['keyframe'][currentkeyframe]['param'].items():
                 try:
                     startPos = float(data['keyframe'][currentkeyframe]['param'][key])
@@ -225,9 +226,9 @@ def liniar(currentkeyframe, data):
 
                 commandValue = commandValue + key + ' ' + str(round(lerp(startPos, goalPos, i/totalframeCurKeyframe),4)) + ' | '
             if 'animation' in data['keyframe'][currentkeyframe]:
-                commandValue = commandValue + ' ' + animationHandler(currentkeyframe,data)
+                commandValue = commandValue + ' ' + animationHandler(currentkeyframe,data) 
             command.append(commandValue)
-
+    
             secondPerRender = float(data['keyframe'][currentkeyframe]['option']['secondsperrender'])
 
             #endtimer
@@ -240,7 +241,7 @@ def liniar(currentkeyframe, data):
             endtime = time.time()
 
             print('\nTime taken: ' + str(round(endtime - starttime,2)) + ' seconds')
-            #estimate time left time x frames
+            #estimate time left time x frames 
             print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i),2)) + ' seconds')
             print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i)/60,2)) + ' minutes')
             print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i) / 3600,2)) + ' hours\n')
@@ -261,7 +262,7 @@ def mvinput(commands, secondPerRender):
         pydi.typewrite(cmd)
         time.sleep(0.1)
         pydi.press('enter')
-        if bool(data['global']['saverenders']) == True:
+        if bool(data['global']['saverenders']) == True:         
             time.sleep(0.2)
             pydi.press('enter')
         else:
@@ -273,32 +274,32 @@ def mvinput(commands, secondPerRender):
             time.sleep(0.2)
             pydi.press('f1')
             print("ahahahaha")
-    time.sleep(secondPerRender)
+    time.sleep(secondPerRender)              
 
-
+    
 def pause(firsttime):
     if firsttime:
         while getForegroundWindowTitle():   #Detect if magicavoxel is active to not spam mv commands into normal user programms like discord
-            time.sleep(3)
+            time.sleep(3)    
         pass
-    else:
+    else:   
         if getForegroundWindowTitle():
             print('Progress paused...')     #This message appears if magicavoxel is not active anymore to prevent damage or unwanted messages
             while getForegroundWindowTitle():
-                time.sleep(5)
+                time.sleep(5)                                   
             print('WARNING: You exited magicavoxel while the render was in progress.')
             print('To avoid problems make sure the console is not selected and if it has any contenct delete it as this might lead to some issues.')
             input('Press enter to confirm')
             print('Select magicavoxel')
 
             while getForegroundWindowTitle():
-                time.sleep(5)
+                time.sleep(5)              
 
 
 def main():
     readconfig()
 start_time = time.time()
-
+    
 
 try:
     main()
@@ -309,3 +310,5 @@ except KeyboardInterrupt:
 #let console open till user closes it
 print('Finished in --- %s seconds ---' % (round(time.time() - start_time)))
 input()
+
+
