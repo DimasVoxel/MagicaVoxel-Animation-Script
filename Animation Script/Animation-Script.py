@@ -17,15 +17,21 @@ else:
 
 atime = int(0)
 
-def getForegroundWindowTitle() -> Optional[str]:
-    hWnd = windll.user32.GetForegroundWindow()
-    length = windll.user32.GetWindowTextLengthW(hWnd)
-    buf = create_unicode_buffer(length + 1)
-    windll.user32.GetWindowTextW(hWnd, buf, length + 1)
-    if buf.value == 'MagicaVoxel | Ephtracy':              #If current active Window Magicavoxel then
-        return False                                       #Continue script (not very performant) takes about 0.2 seconds to run and is has a noticable impact how fast something can go.
-    else:
-        return True
+def magicaIsForeground():
+    if sys.platform == "win32":
+        hWnd = windll.user32.GetForegroundWindow()
+        length = windll.user32.GetWindowTextLengthW(hWnd)
+        buf = create_unicode_buffer(length + 1)
+        windll.user32.GetWindowTextW(hWnd, buf, length + 1)
+        if buf.value == 'MagicaVoxel | Ephtracy':              #If current active Window Magicavoxel then
+            return True                                       #Continue script (not very performant) takes about 0.2 seconds to run and is has a noticable impact how fast something can go.
+        else:
+            return False
+    elif sys.platform == "darwin":
+        if NSWorkspace.sharedWorkspace().activeApplication()['NSApplicationName'] == 'MagicaVoxel':
+            return True
+        else:
+            return False
 
 
 def exitprog():
@@ -286,20 +292,20 @@ def mvinput(command,secondPerRender):
 
 def pause(firsttime):
     if firsttime:
-        while getForegroundWindowTitle():   #Detect if magicavoxel is active to not spam mv commands into normal user programms like discord
+        while not magicaIsForeground():   #Detect if magicavoxel is active to not spam mv commands into normal user programms like discord
             time.sleep(3)
         pass
     else:
-        if getForegroundWindowTitle():
+        if not magicaIsForeground():
             print('Progress paused...')     #This message appears if magicavoxel is not active anymore to prevent damage or unwanted messages
-            while getForegroundWindowTitle():
+            while not magicaIsForeground():
                 time.sleep(5)
             print('WARNING: You exited magicavoxel while the render was in progress.')
             print('To avoid problems make sure the console is not selected and if it has any contenct delete it as this might lead to some issues.')
             input('Press enter to confirm')
             print('Select magicavoxel')
 
-            while getForegroundWindowTitle():
+            while not magicaIsForeground():
                 time.sleep(5)
 
 
