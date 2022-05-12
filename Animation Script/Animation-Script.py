@@ -1,11 +1,19 @@
-from ctypes import windll, create_unicode_buffer
+import os
+import sys
+
 from typing import Optional
 import pyperclip
-import pydirectinput as pydi
 import time
 import json
-import sys
-import os
+
+if sys.platform == "win32":
+    from ctypes import windll, create_unicode_buffer
+    import pydirectinput as pydi
+elif sys.platform == "darwin":
+    from AppKit import NSWorkspace
+    import pyautogui as pydi #se PyAutoGUI instead since pydirectinput is windows only
+else:
+    raise OSError("Unsupported OS")
 
 atime = int(0)
 
