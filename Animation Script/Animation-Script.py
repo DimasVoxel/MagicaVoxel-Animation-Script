@@ -1,5 +1,4 @@
-from time import process_time_ns, thread_time_ns
-from ctypes import wintypes, windll, create_unicode_buffer
+from ctypes import windll, create_unicode_buffer
 from typing import Optional
 import pyperclip
 import pydirectinput as pydi
@@ -8,7 +7,6 @@ import json
 import sys
 import os
 
-global atime
 atime = int(0)
 
 def getForegroundWindowTitle() -> Optional[str]:
@@ -311,5 +309,3 @@ except KeyboardInterrupt:
 #let console open till user closes it
 print('Finished in --- %s seconds ---' % (round(time.time() - start_time)))
 input()
-
-
