@@ -284,14 +284,14 @@ def mvinput(command,secondPerRender):
         #Wait until the magicaVoxel window is in the foreground again
         pause(False)
         #Once it is in the foreground, execute the commands
-        pydi.press('f1')
+        pydi.press('f1') #Open Magica console
         pyperclip.copy(command[i])
         paste()
         time.sleep(0.2)
-        pydi.press('enter')
+        pydi.press('enter') #Confirm command
         if bool(data['global']['saverenders']) == True:
             time.sleep(0.2)
-            pydi.press('enter')
+            pydi.press('enter') #Confirm the save render popup
         else:
             time.sleep(0.2)
             pydi.press('f1')
