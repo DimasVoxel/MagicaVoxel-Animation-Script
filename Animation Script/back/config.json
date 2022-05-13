@@ -1,0 +1,258 @@
+{
+    "keyframe": [
+        {
+            "param": {
+                "cam x": -14.899999618530273,
+                "cam y": -44.099998474121094,
+                "cam z": 129.8000030517578,
+                "cam rx": -21.299999237060547,
+                "cam ry": 44.900001525878906,
+                "cam zoom": 224.5,
+                "set pt_fix_focus 1 | set pt_focus": 5044.60009765625,
+                "set pt_fix_focus 1 | set pt_dof": 0.27000001072883606
+            },
+            "option": {
+                "frames": 20,
+                "secondsperrender": 0.1,
+                "interpolation": "bezier",
+                "direction_lin": "Clockwise",
+                "direction_bez": "shortest"
+            },
+            "animation": {
+                "enable animation": true,
+                "loop": true,
+                "startframe": 0,
+                "endframe": 119
+            }
+        },
+        {
+            "param": {
+                "cam x": -13.399999618530273,
+                "cam y": -34.70000076293945,
+                "cam z": 130.1999969482422,
+                "cam rx": -42,
+                "cam ry": 97.30000305175781,
+                "cam zoom": 224.5,
+                "set pt_fix_focus 1 | set pt_focus": 5011.39990234375,
+                "set pt_fix_focus 1 | set pt_dof": 0.5299999713897705
+            },
+            "option": {
+                "frames": 20,
+                "secondsperrender": 0.1,
+                "interpolation": "bezier-sequence",
+                "direction_lin": "Clockwise",
+                "direction_bez": "shortest"
+            },
+            "animation": {
+                "enable animation": true,
+                "loop": true,
+                "startframe": 0,
+                "endframe": 119
+            }
+        },
+        {
+            "param": {
+                "cam x": 0.5,
+                "cam y": -3.5,
+                "cam z": 166.5,
+                "cam rx": -59.900001525878906,
+                "cam ry": -166.8000030517578,
+                "cam zoom": 196,
+                "set pt_fix_focus 1 | set pt_focus": 5022.89990234375,
+                "set pt_fix_focus 1 | set pt_dof": 0.6299999952316284
+            },
+            "option": {
+                "frames": 20,
+                "secondsperrender": 0.1,
+                "interpolation": "bezier-sequence",
+                "direction_lin": "Counterclockwise",
+                "direction_bez": "shortest"
+            },
+            "animation": {
+                "enable animation": true,
+                "loop": true,
+                "startframe": 0,
+                "endframe": 119
+            }
+        },
+        {
+            "param": {
+                "cam x": 0.5,
+                "cam y": -3.5,
+                "cam z": 149.5,
+                "cam rx": -59.900001525878906,
+                "cam ry": -166.8000030517578,
+                "cam zoom": 161.89999389648438,
+                "set pt_fix_focus 1 | set pt_focus": 5032.89990234375,
+                "set pt_fix_focus 1 | set pt_dof": 0.5199999809265137
+            },
+            "option": {
+                "frames": 20,
+                "secondsperrender": 0.1,
+                "interpolation": "bezier-sequence",
+                "direction_lin": "Counterclockwise",
+                "direction_bez": "shortest"
+            },
+            "animation": {
+                "enable animation": false,
+                "loop": false,
+                "startframe": 0,
+                "endframe": 0
+            }
+        },
+        {
+            "param": {
+                "cam x": 0.5,
+                "cam y": -3.5,
+                "cam z": 166.5,
+                "cam rx": -90,
+                "cam ry": -36.599998474121094,
+                "cam zoom": 121.69999694824219,
+                "set pt_fix_focus 1 | set pt_focus": 5042.5,
+                "set pt_fix_focus 1 | set pt_dof": 0.7900000214576721
+            },
+            "option": {
+                "frames": 20,
+                "secondsperrender": 0.1,
+                "interpolation": "bezier-sequence",
+                "direction_lin": "Counterclockwise",
+                "direction_bez": "shortest"
+            },
+            "animation": {
+                "enable animation": false,
+                "loop": false,
+                "startframe": 0,
+                "endframe": 0
+            }
+        },
+        {
+            "param": {
+                "cam x": 0.5,
+                "cam y": -3.5,
+                "cam z": 166.5,
+                "cam rx": -90,
+                "cam ry": 42.599998474121094,
+                "cam zoom": 147.1999969482422,
+                "set pt_fix_focus 1 | set pt_focus": 5042.5,
+                "set pt_fix_focus 1 | set pt_dof": 1
+            },
+            "option": {
+                "frames": 20,
+                "secondsperrender": 0.1,
+                "interpolation": "bezier-sequence",
+                "direction_lin": "Counterclockwise",
+                "direction_bez": "shortest"
+            },
+            "animation": {
+                "enable animation": false,
+                "loop": false,
+                "startframe": 0,
+                "endframe": 0
+            }
+        },
+        {
+            "param": {
+                "cam x": 0.5,
+                "cam y": -3.5,
+                "cam z": 166.5,
+                "cam rx": -90,
+                "cam ry": -168.3000030517578,
+                "cam zoom": 215.60000610351562,
+                "set pt_fix_focus 1 | set pt_focus": 5042.5,
+                "set pt_fix_focus 1 | set pt_dof": 1
+            },
+            "option": {
+                "frames": 20,
+                "secondsperrender": 0.1,
+                "interpolation": "bezier-sequence",
+                "direction_lin": "Clockwise",
+                "direction_bez": "shortest"
+            },
+            "animation": {
+                "enable animation": false,
+                "loop": false,
+                "startframe": 0,
+                "endframe": 0
+            }
+        },
+        {
+            "param": {
+                "cam x": 0.5,
+                "cam y": -3.5,
+                "cam z": 166.5,
+                "cam rx": -48.400001525878906,
+                "cam ry": -121.30000305175781,
+                "cam zoom": 215.60000610351562,
+                "set pt_fix_focus 1 | set pt_focus": 5029.2001953125,
+                "set pt_fix_focus 1 | set pt_dof": 0.6200000047683716
+            },
+            "option": {
+                "frames": 20,
+                "secondsperrender": 0.1,
+                "interpolation": "bezier-sequence",
+                "direction_lin": "Clockwise",
+                "direction_bez": "shortest"
+            },
+            "animation": {
+                "enable animation": false,
+                "loop": false,
+                "startframe": 0,
+                "endframe": 0
+            }
+        },
+        {
+            "param": {
+                "cam x": 0.5,
+                "cam y": -3.5,
+                "cam z": 121.5,
+                "cam rx": -30.600000381469727,
+                "cam ry": -47,
+                "cam zoom": 215.60000610351562,
+                "set pt_fix_focus 1 | set pt_focus": 5018.60009765625,
+                "set pt_fix_focus 1 | set pt_dof": 0.38999998569488525
+            },
+            "option": {
+                "frames": 20,
+                "secondsperrender": 0.1,
+                "interpolation": "bezier-sequence",
+                "direction_lin": "Clockwise",
+                "direction_bez": "shortest"
+            },
+            "animation": {
+                "enable animation": false,
+                "loop": false,
+                "startframe": 0,
+                "endframe": 0
+            }
+        },
+        {
+            "param": {
+                "cam x": -14.899999618530273,
+                "cam y": -44.099998474121094,
+                "cam z": 129.8000030517578,
+                "cam rx": -21.299999237060547,
+                "cam ry": 44.900001525878906,
+                "cam zoom": 224.5,
+                "set pt_fix_focus 1 | set pt_focus": 5044.60009765625,
+                "set pt_fix_focus 1 | set pt_dof": 0.27000001072883606
+            },
+            "option": {
+                "frames": 20,
+                "secondsperrender": 0.1,
+                "interpolation": "bezier-sequence",
+                "direction_lin": "Clockwise",
+                "direction_bez": "shortest"
+            },
+            "animation": {
+                "enable animation": false,
+                "loop": false,
+                "startframe": 0,
+                "endframe": 0
+            }
+        }
+    ],
+    "global": {
+        "saverenders": true
+    },
+    "version": 3
+}

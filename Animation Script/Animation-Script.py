@@ -274,7 +274,6 @@ def mvinput(command,secondPerRender):
         if command[i].find('snap') == -1:
             time.sleep(0.2)
             pydi.press('f1')
-            print("ahahahaha")
     time.sleep(secondPerRender)
 
 

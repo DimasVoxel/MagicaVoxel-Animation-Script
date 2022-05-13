@@ -993,9 +993,10 @@ dpg.create_context()
 #      print("Ui not found, make sure the ui folder is in the same directory as this script")
 #      exit()
 readJson()
-if config["version"] != configVersion:
-    config = {}
-    config["keyframe"] = []
+if config["keyframe"] != []:
+    if config["version"] != configVersion:
+        config = {}
+        config["keyframe"] = []
 
 
 with dpg.viewport_menu_bar():
