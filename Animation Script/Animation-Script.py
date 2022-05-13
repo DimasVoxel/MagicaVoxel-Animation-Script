@@ -15,6 +15,7 @@ elif sys.platform == "darwin":
 else:
     raise OSError("Unsupported OS")
 
+pydi.PAUSE = 0.01
 atime = int(0)
 
 def magicaIsForeground():
@@ -265,14 +266,25 @@ def liniar(currentkeyframe, data):
 
     #print('Keyframe: ' + str(currentkeyframe+2) + ' of ' + str(len(data['keyframe'])))
 
-def mvinput(command,secondPerRender):
-    for i in range(len(command)):
-        pydi.press('f1')
-        pause(False)
-        pyperclip.copy(command[i])
+def paste():
+    '''
+    Pastes the content of the clipboard to the selected text input field.
+    '''
+    if sys.platform == 'win32': #For windows, use individual keypresses, because pydirectinput does not support .hotkey()
         pydi.keyDown('ctrl')
         pydi.press('v')
         pydi.keyUp('ctrl')
+    elif sys.platform == 'darwin': #For MacOS use .hotkey() since it is simpler, and more reliable
+        pydi.hotkey('command', 'v')
+
+def mvinput(command,secondPerRender):
+    for i in range(len(command)):
+        #Wait until the magicaVoxel window is in the foreground again
+        pause(False)
+        #Once it is in the foreground, execute the commands
+        pydi.press('f1')
+        pyperclip.copy(command[i])
+        paste()
         time.sleep(0.2)
         pydi.press('enter')
         if bool(data['global']['saverenders']) == True:
