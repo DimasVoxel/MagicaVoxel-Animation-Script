@@ -80,7 +80,8 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
         commandstring = commandstring + ' ' + animationHandler(firstkeyframe,data)
         command.append(commandstring)
 
-        print('#'*(os.get_terminal_size().columns))
+        try: print('#'*(os.get_terminal_size().columns))
+        except OSError: pass
         print('\nLast command: ' + str(command))
         print('Frame: ' + str(frame+1) + ' of ' + str(ammountframes))
         mvinput(command,float(data['keyframe'][firstkeyframe]['option']['secondsperrender']))
@@ -256,7 +257,8 @@ def liniar(currentkeyframe, data):
             print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i),2)) + ' seconds')
             print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i)/60,2)) + ' minutes')
             print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i) / 3600,2)) + ' hours\n')
-            print('#'*(os.get_terminal_size().columns))
+            try: print('#'*(os.get_terminal_size().columns))
+            except OSError: pass
 
 
 
