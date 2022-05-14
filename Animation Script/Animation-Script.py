@@ -9,9 +9,11 @@ import json
 if sys.platform == "win32":
     from ctypes import windll, create_unicode_buffer
     import pydirectinput as pydi
+    k_console = "f1"
 elif sys.platform == "darwin":
     from AppKit import NSWorkspace
     import pyautogui as pydi #Use PyAutoGUI instead since pydirectinput is windows only
+    k_console = "f2"
 else:
     raise OSError("Unsupported OS")
 
@@ -284,7 +286,7 @@ def mvinput(command,secondPerRender):
         #Wait until the magicaVoxel window is in the foreground again
         pause(False)
         #Once it is in the foreground, execute the commands
-        pydi.press('f1') #Open Magica console
+        pydi.press(k_console) #Open Magica console
         pyperclip.copy(command[i])
         paste()
         time.sleep(0.2)
@@ -294,12 +296,12 @@ def mvinput(command,secondPerRender):
             pydi.press('enter') #Confirm the save render popup
         else:
             time.sleep(0.2)
-            pydi.press('f1')
+            pydi.press(k_console)
 
         #check if "snap" is in the string of command
         if command[i].find('snap') == -1:
             time.sleep(0.2)
-            pydi.press('f1')
+            pydi.press(k_console)
     time.sleep(secondPerRender)
 
 
