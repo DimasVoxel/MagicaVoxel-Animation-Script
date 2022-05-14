@@ -294,12 +294,10 @@ def mvinput(command,secondPerRender):
         if bool(data['global']['saverenders']) == True:
             time.sleep(0.2)
             pydi.press('enter') #Confirm the save render popup
-        else:
-            time.sleep(0.2)
-            pydi.press(k_console)
 
-        #check if "snap" is in the string of command
-        if cmd.find('snap') == -1:
+        #Close the Magica console again to get back to have Magica be in its "starting state" again with no console selected.
+        #On MacOS, this has to be done every time. On Windows, this has to be done only if no save popup was created, because here a save popup will deselect the console.
+        if sys.platform == "darwin" or not cmd.startswith('snap'):
             time.sleep(0.2)
             pydi.press(k_console)
     time.sleep(secondPerRender)
