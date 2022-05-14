@@ -11,7 +11,7 @@ if sys.platform == "win32":
     import pydirectinput as pydi
 elif sys.platform == "darwin":
     from AppKit import NSWorkspace
-    import pyautogui as pydi #se PyAutoGUI instead since pydirectinput is windows only
+    import pyautogui as pydi #Use PyAutoGUI instead since pydirectinput is windows only
 else:
     raise OSError("Unsupported OS")
 
