@@ -282,12 +282,12 @@ def paste():
         pydi.hotkey('command', 'v')
 
 def mvinput(command,secondPerRender):
-    for i in range(len(command)):
+    for cmd in command:
         #Wait until the magicaVoxel window is in the foreground again
         pause(False)
         #Once it is in the foreground, execute the commands
         pydi.press(k_console) #Open Magica console
-        pyperclip.copy(command[i])
+        pyperclip.copy(cmd)
         paste()
         time.sleep(0.2)
         pydi.press('enter') #Confirm command
@@ -299,7 +299,7 @@ def mvinput(command,secondPerRender):
             pydi.press(k_console)
 
         #check if "snap" is in the string of command
-        if command[i].find('snap') == -1:
+        if cmd.find('snap') == -1:
             time.sleep(0.2)
             pydi.press(k_console)
     time.sleep(secondPerRender)
