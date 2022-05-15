@@ -307,7 +307,6 @@ def pause(firsttime):
     if firsttime:
         while not magicaIsForeground():   #Detect if magicavoxel is active to not spam mv commands into normal user programms like discord
             time.sleep(3)
-        pass
     else:
         if not magicaIsForeground():
             print('Progress paused...')     #This message appears if magicavoxel is not active anymore to prevent damage or unwanted messages
