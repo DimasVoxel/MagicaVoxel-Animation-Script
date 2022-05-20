@@ -6,22 +6,22 @@ import pyperclip
 import time
 import json
 
-if sys.platform == "win32":
+if sys.platform == 'win32':
     from ctypes import windll, create_unicode_buffer
     import pydirectinput as pydi
-    k_console = "f1"
-elif sys.platform == "darwin":
+    k_console = 'f1'
+elif sys.platform == 'darwin':
     from AppKit import NSWorkspace
     import pyautogui as pydi #Use PyAutoGUI instead since pydirectinput is windows only
-    k_console = "f2"
+    k_console = 'f2'
 else:
-    raise OSError("Unsupported OS")
+    raise OSError('Unsupported OS')
 
 pydi.PAUSE = 0.01
 atime = int(0)
 
 def magicaIsForeground():
-    if sys.platform == "win32":
+    if sys.platform == 'win32':
         hWnd = windll.user32.GetForegroundWindow()
         length = windll.user32.GetWindowTextLengthW(hWnd)
         buf = create_unicode_buffer(length + 1)
@@ -30,7 +30,7 @@ def magicaIsForeground():
             return True                                       #Continue script (not very performant) takes about 0.2 seconds to run and is has a noticable impact how fast something can go.
         else:
             return False
-    elif sys.platform == "darwin":
+    elif sys.platform == 'darwin':
         if NSWorkspace.sharedWorkspace().activeApplication()['NSApplicationName'] == 'MagicaVoxel':
             return True
         else:
@@ -155,7 +155,7 @@ def readconfig():
         exitprog()
 
     if data['version'] == '3':
-        print("Your config file is outdated. Please generate a new one.")
+        print('Your config file is outdated. Please generate a new one.')
         exitprog()
 
     print('Please open MagicaVoxel and make sure its in the foreground.')
@@ -297,7 +297,7 @@ def mvinput(command,secondPerRender):
 
         #Close the Magica console again to get back to have Magica be in its "starting state" again with no console selected.
         #On MacOS, this has to be done every time. On Windows, this has to be done only if no save popup was created, because here a save popup will deselect the console.
-        if sys.platform == "darwin" or not cmd.startswith('snap'):
+        if sys.platform == 'darwin' or not cmd.startswith('snap'):
             time.sleep(0.2)
             pydi.press(k_console)
     time.sleep(secondPerRender)
