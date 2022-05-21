@@ -1,25 +1,40 @@
-from time import process_time_ns, thread_time_ns
-from ctypes import wintypes, windll, create_unicode_buffer
+import os
+import sys
+
 from typing import Optional
 import pyperclip
-import pydirectinput as pydi
 import time
 import json
-import sys
-import os
 
-global atime
+if sys.platform == 'win32':
+    from ctypes import windll, create_unicode_buffer
+    import pydirectinput as pydi
+    k_console = 'f1'
+elif sys.platform == 'darwin':
+    from AppKit import NSWorkspace
+    import pyautogui as pydi #Use PyAutoGUI instead since pydirectinput is windows only
+    k_console = 'f2'
+else:
+    raise OSError('Unsupported OS')
+
+pydi.PAUSE = 0.01
 atime = int(0)
 
-def getForegroundWindowTitle() -> Optional[str]:
-    hWnd = windll.user32.GetForegroundWindow()
-    length = windll.user32.GetWindowTextLengthW(hWnd)
-    buf = create_unicode_buffer(length + 1)
-    windll.user32.GetWindowTextW(hWnd, buf, length + 1)
-    if buf.value == 'MagicaVoxel | Ephtracy':              #If current active Window Magicavoxel then
-        return False                                       #Continue script (not very performant) takes about 0.2 seconds to run and is has a noticable impact how fast something can go.
-    else:
-        return True
+def magicaIsForeground():
+    if sys.platform == 'win32':
+        hWnd = windll.user32.GetForegroundWindow()
+        length = windll.user32.GetWindowTextLengthW(hWnd)
+        buf = create_unicode_buffer(length + 1)
+        windll.user32.GetWindowTextW(hWnd, buf, length + 1)
+        if buf.value == 'MagicaVoxel | Ephtracy':              #If current active Window Magicavoxel then
+            return True                                       #Continue script (not very performant) takes about 0.2 seconds to run and is has a noticable impact how fast something can go.
+        else:
+            return False
+    elif sys.platform == 'darwin':
+        if NSWorkspace.sharedWorkspace().activeApplication()['NSApplicationName'] == 'MagicaVoxel':
+            return True
+        else:
+            return False
 
 
 def exitprog():
@@ -67,7 +82,8 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
         commandstring = commandstring + ' ' + animationHandler(firstkeyframe,data)
         command.append(commandstring)
 
-        print('#'*(os.get_terminal_size().columns))
+        try: print('#'*(os.get_terminal_size().columns))
+        except (OSError, ValueError): pass
         print('\nLast command: ' + str(command))
         print('Frame: ' + str(frame+1) + ' of ' + str(ammountframes))
         mvinput(command,float(data['keyframe'][firstkeyframe]['option']['secondsperrender']))
@@ -139,7 +155,7 @@ def readconfig():
         exitprog()
 
     if data['version'] == '3':
-        print("Your config file is outdated. Please generate a new one.")
+        print('Your config file is outdated. Please generate a new one.')
         exitprog()
 
     print('Please open MagicaVoxel and make sure its in the foreground.')
@@ -243,7 +259,8 @@ def liniar(currentkeyframe, data):
             print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i),2)) + ' seconds')
             print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i)/60,2)) + ' minutes')
             print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i) / 3600,2)) + ' hours\n')
-            print('#'*(os.get_terminal_size().columns))
+            try: print('#'*(os.get_terminal_size().columns))
+            except (OSError, ValueError): pass
 
 
 
@@ -253,46 +270,54 @@ def liniar(currentkeyframe, data):
 
     #print('Keyframe: ' + str(currentkeyframe+2) + ' of ' + str(len(data['keyframe'])))
 
-def mvinput(command,secondPerRender):
-    for i in range(len(command)):
-        pydi.press('f1')
-        pause(False)
-        pyperclip.copy(command[i])
+def paste():
+    '''
+    Pastes the content of the clipboard to the selected text input field.
+    '''
+    if sys.platform == 'win32': #For windows, use individual keypresses, because pydirectinput does not support .hotkey()
         pydi.keyDown('ctrl')
         pydi.press('v')
         pydi.keyUp('ctrl')
+    elif sys.platform == 'darwin': #For MacOS use .hotkey() since it is simpler, and more reliable
+        pydi.hotkey('command', 'v')
+
+def mvinput(command,secondPerRender):
+    for cmd in command:
+        #Wait until the magicaVoxel window is in the foreground again
+        pause(False)
+        #Once it is in the foreground, execute the commands
+        pydi.press(k_console) #Open Magica console
+        pyperclip.copy(cmd)
+        paste()
         time.sleep(0.2)
-        pydi.press('enter')
+        pydi.press('enter') #Confirm command
         if bool(data['global']['saverenders']) == True:
             time.sleep(0.2)
-            pydi.press('enter')
-        else:
-            time.sleep(0.2)
-            pydi.press('f1')
+            pydi.press('enter') #Confirm the save render popup
 
-        #check if "snap" is in the string of command
-        if command[i].find('snap') == -1:
+        #Close the Magica console again to get back to have Magica be in its "starting state" again with no console selected.
+        #On MacOS, this has to be done every time. On Windows, this has to be done only if no save popup was created, because here a save popup will deselect the console.
+        if sys.platform == 'darwin' or not cmd.startswith('snap'):
             time.sleep(0.2)
-            pydi.press('f1')
+            pydi.press(k_console)
     time.sleep(secondPerRender)
 
 
 def pause(firsttime):
     if firsttime:
-        while getForegroundWindowTitle():   #Detect if magicavoxel is active to not spam mv commands into normal user programms like discord
+        while not magicaIsForeground():   #Detect if magicavoxel is active to not spam mv commands into normal user programms like discord
             time.sleep(3)
-        pass
     else:
-        if getForegroundWindowTitle():
+        if not magicaIsForeground():
             print('Progress paused...')     #This message appears if magicavoxel is not active anymore to prevent damage or unwanted messages
-            while getForegroundWindowTitle():
+            while not magicaIsForeground():
                 time.sleep(5)
             print('WARNING: You exited magicavoxel while the render was in progress.')
             print('To avoid problems make sure the console is not selected and if it has any contenct delete it as this might lead to some issues.')
             input('Press enter to confirm')
             print('Select magicavoxel')
 
-            while getForegroundWindowTitle():
+            while not magicaIsForeground():
                 time.sleep(5)
 
 
@@ -310,5 +335,3 @@ except KeyboardInterrupt:
 #let console open till user closes it
 print('Finished in --- %s seconds ---' % (round(time.time() - start_time)))
 input()
-
-
