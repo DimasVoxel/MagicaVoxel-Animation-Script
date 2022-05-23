@@ -106,13 +106,13 @@ def beznormalise(lerparray, firstkeyframe, lastkeyframe, data):
     newlerparray = [lerparray[0]]
     for i in range(firstkeyframe,lastkeyframe):
         p_yaw = newlerparray[-1]
-        n_yaw = data["keyframe"][i+1]["param"]["cam ry"]
+        n_yaw = data['keyframe'][i+1]['param']['cam ry']
 
-        if data["keyframe"][i+1]["option"]["direction"] == "Clockwise":
+        if data['keyframe'][i+1]['option']['direction'] == 'Clockwise':
             while n_yaw <= p_yaw:
                 n_yaw = n_yaw + 360
             newlerparray.append(n_yaw)
-        elif data["keyframe"][i+1]["option"]["direction"] == "Counterclockwise":
+        elif data['keyframe'][i+1]['option']['direction'] == 'Counterclockwise':
             while n_yaw >= p_yaw:
                 n_yaw = n_yaw - 360
             newlerparray.append(n_yaw)
