@@ -75,7 +75,7 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
             if key.find('ry') != -1:
                 lerparray = beznormalise(lerparray,firstkeyframe,lastkeyframe,data)
 
-            commandstring = commandstring + key + ' ' + str(round(bezier(lerparray, frame/ammountframes,key),4)) + ' | '
+            commandstring = commandstring + key + ' ' + str(round(bezier(lerparray, frame/ammountframes),4)) + ' | '
             if len(commandstring) > 400:
                 command.append(commandstring)
                 commandstring = ''
@@ -127,18 +127,11 @@ def beznormalise(lerparray,firstkeyframe,lastkeyframe,data):
 
 
 
-def bezier(lerparray, frame,key):
-    newlerparray = []
+def bezier(lerparray, perc):
     while len(lerparray) > 1:
-        for i in range(len(lerparray)-1):
-            newlerparray.append(float(lerp(lerparray[i],lerparray[i+1],frame)))
-        if len(newlerparray) == 0:
-            newlerparray.append(0)
-        if len(newlerparray) == 1:
-            return float(newlerparray[0])
-        else:
-            lerparray = newlerparray
-            newlerparray = []
+        lerparray = [lerp(a, b, perc) for a, b in zip(lerparray, lerparray[1:])] #Only slice the second one, because the zip will slice the first one
+    return lerparray[0]
+
 
 def lerp(a, b, t):
     return float(a + (b - a) * t)
