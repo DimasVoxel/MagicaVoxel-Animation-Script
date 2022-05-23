@@ -56,7 +56,7 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
 
     if isdupicate == False:
         print('The animation has been stopped since there are no parameters to animate.\nFor an animation you need atleast 2 keyframes with the same parameter')
-        print('Skipping Keyframes: '+str(firstkeyframe)+' to '+str(lastkeyframe))
+        print(f'Skipping Keyframes: {firstkeyframe} to {lastkeyframe}')
         return
 
     for frame in range(ammountframes):
@@ -84,19 +84,20 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
 
         try: print('#'*(os.get_terminal_size().columns))
         except (OSError, ValueError): pass
-        print('\nLast command: ' + str(command))
-        print('Frame: ' + str(frame+1) + ' of ' + str(ammountframes))
+        print(f'\nLast command: {command}')
+        print(f'Frame: {frame+1} of {ammountframes}')
         mvinput(command,float(data['keyframe'][firstkeyframe]['option']['secondsperrender']))
 
         #endtimer
         endtime = time.time()
 
 
-        print('\nTime taken: ' + str(round(endtime - starttime,2)) + ' seconds')
+        print(f'\nTime taken: {endtime - starttime:.2f} seconds')
         #estimate time left time x frames
-        print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame),2)) + ' seconds')
-        print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame)/60,2)) + ' minutes')
-        print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame) / 3600,2)) + ' hours')
+        time_estimate = (endtime - starttime) * (ammountframes - frame)
+        print(f'Estimated time left: {time_estimate:.2f} seconds')
+        print(f'Estimated time left: {time_estimate/60:.2f} minutes')
+        print(f'Estimated time left: {time_estimate/3600:.2f} hours')
 
 def beznormalise(lerparray, firstkeyframe, lastkeyframe, data):
     '''
@@ -214,7 +215,7 @@ def liniar(currentkeyframe, data):
                     startPos = float(data['keyframe'][currentkeyframe]['param'][key])
                     goalPos = float(data['keyframe'][currentkeyframe+1]['param'][key])
                 except KeyError:
-                    print('\nERROR: Parameter '+ key + ' is missing in target keyframe. Parameter is being skipped.')
+                    print(f'\nERROR: Parameter {key} is missing in target keyframe. Parameter is being skipped.')
                     goalPos = startPos
 
                 if key.find('ry') != -1: #There should be a function that does normalisation for all parameters that require it not just cam ry / yaw
@@ -235,18 +236,19 @@ def liniar(currentkeyframe, data):
 
             #endtimer
 
-            print('Frame: ' + str(i) + ' of ' + str(totalframeCurKeyframe-1))
+            print(f'Frame: {i} of {totalframeCurKeyframe-1}')
 
 
             mvinput(command,secondPerRender)
 
             endtime = time.time()
 
-            print('\nTime taken: ' + str(round(endtime - starttime,2)) + ' seconds')
+            print(f'\nTime taken: {endtime - starttime:.2f} seconds')
+            time_estimate = (endtime - starttime) * (totalframeCurKeyframe - i)
             #estimate time left time x frames
-            print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i),2)) + ' seconds')
-            print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i)/60,2)) + ' minutes')
-            print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i) / 3600,2)) + ' hours\n')
+            print(f'Estimated time left: {time_estimate:.2f} seconds')
+            print(f'Estimated time left: {time_estimate/60:.2f} minutes')
+            print(f'Estimated time left: {time_estimate/3600:.2f} hours\n')
             try: print('#'*(os.get_terminal_size().columns))
             except (OSError, ValueError): pass
 
@@ -324,5 +326,5 @@ except KeyboardInterrupt:
     sys.exit(0)
 
 #let console open till user closes it
-print('Finished in --- %s seconds ---' % (round(time.time() - start_time)))
+print(f'Finished in --- {time.time() - start_time:.0f} seconds ---')
 input()
