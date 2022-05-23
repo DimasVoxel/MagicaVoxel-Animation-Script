@@ -1,7 +1,6 @@
 import os
 import sys
 
-from typing import Optional
 import pyperclip
 import time
 import json
