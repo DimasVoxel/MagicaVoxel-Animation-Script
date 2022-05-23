@@ -297,6 +297,9 @@ def mvinput(command,secondPerRender):
 
 
 def pause(firsttime):
+    '''
+    Waits until MagicaVoxel is set to the foreground (again), to make sure no inputs are given if the user switches to a different program during execution.
+    '''
     if firsttime:
         while not magicaIsForeground():   #Detect if magicavoxel is active to not spam mv commands into normal user programms like discord
             time.sleep(3)
