@@ -116,6 +116,8 @@ def beznormalise(lerparray, firstkeyframe, lastkeyframe, data):
             while n_yaw >= p_yaw:
                 n_yaw = n_yaw - 360
             newlerparray.append(n_yaw)
+        elif data['keyframe'][i+1]['option']['direction'] == 'Static':
+            newlerparray.append(p_yaw)
 
     return newlerparray
 
