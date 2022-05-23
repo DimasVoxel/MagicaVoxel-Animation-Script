@@ -98,33 +98,26 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
         print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame)/60,2)) + ' minutes')
         print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame) / 3600,2)) + ' hours')
 
-def beznormalise(lerparray,firstkeyframe,lastkeyframe,data):
-    newlerparray = []
-    newlerparray.append(lerparray[0])
+def beznormalise(lerparray, firstkeyframe, lastkeyframe, data):
+    '''
+    Normalises angles, such that they will wrap around correctly around 360 degrees, and will rotate in the right direction.
+    If the next angle is the same as the previous angle, it will assume a full rotation.
+    '''
+    newlerparray = [lerparray[0]]
     for i in range(firstkeyframe,lastkeyframe):
-        p_yaw = newlerparray[i]
+        p_yaw = newlerparray[-1]
         n_yaw = data["keyframe"][i+1]["param"]["cam ry"]
 
-
-        if data["keyframe"][i]["option"]["direction"] == "Clockwise":
-            if n_yaw > p_yaw:
-                newlerparray.append(newlerparray[i]+(n_yaw-p_yaw))
-            if n_yaw < p_yaw:
-                while n_yaw < p_yaw:
-                    n_yaw = n_yaw + 360
-                newlerparray.append(newlerparray[i]+(n_yaw-p_yaw))
-        if data["keyframe"][i]["option"]["direction"] == "Counterclockwise":
-            if n_yaw < p_yaw:
-                newlerparray.append(newlerparray[i]+(n_yaw-p_yaw))
-            if n_yaw > p_yaw:
-                while n_yaw > p_yaw:
-                    n_yaw = n_yaw - 360
-                newlerparray.append(newlerparray[i]+(n_yaw-p_yaw))
-
+        if data["keyframe"][i+1]["option"]["direction"] == "Clockwise":
+            while n_yaw <= p_yaw:
+                n_yaw = n_yaw + 360
+            newlerparray.append(n_yaw)
+        elif data["keyframe"][i+1]["option"]["direction"] == "Counterclockwise":
+            while n_yaw >= p_yaw:
+                n_yaw = n_yaw - 360
+            newlerparray.append(n_yaw)
 
     return newlerparray
-
-
 
 
 def bezier(lerparray, perc):
