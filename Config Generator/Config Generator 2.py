@@ -8,7 +8,7 @@ setup = False
 tabpos = {}
 configVersion = 3
 
-magicavoxel_paramters = {
+magicavoxel_parameters = {
     "camera":{
         "cam rx": {
             "desc":"Camera Pitch",
@@ -609,7 +609,7 @@ def sync(keyframe):
     global config
     for attribute, mvcommands in config["keyframe"][keyframe-1].items():
         for param, value in config["keyframe"][keyframe-1][attribute].items():
-            mvdictvalue = magicavoxel_paramters[attribute][param]
+            mvdictvalue = magicavoxel_parameters[attribute][param]
             #print("Attribute: " + attribute + " Param: " + param + " Value: " + str(value))
             translateNewParam("","",(keyframe,param,mvdictvalue,attribute,value))
 
@@ -628,12 +628,12 @@ def translateNewParam(callback,data,userdata):
     paramType = str(userdata[3])
     tagKey = "input:"+paramKey+":"+keyframeNum
     parentKey = "window:"+paramType+":"+keyframeNum
-    labelName = magicavoxel_paramters[paramType][paramKey]["desc"]
-    keyType = magicavoxel_paramters[paramType][paramKey]["optionType"]
+    labelName = magicavoxel_parameters[paramType][paramKey]["desc"]
+    keyType = magicavoxel_parameters[paramType][paramKey]["optionType"]
     callbackData = (keyframeNum,paramKey,paramValue,paramType)
     if keyType == "float" or keyType ==  "int":
-        maxValue = float(magicavoxel_paramters[paramType][paramKey]["max"])
-        minValue = float(magicavoxel_paramters[paramType][paramKey]["min"])
+        maxValue = float(magicavoxel_parameters[paramType][paramKey]["max"])
+        minValue = float(magicavoxel_parameters[paramType][paramKey]["min"])
 
     #if userdata[2]["default"] exists then use it
     if len(userdata) == 5:
@@ -650,10 +650,10 @@ def translateNewParam(callback,data,userdata):
                 value = ""
 
     if keyType == "select":
-        selval = magicavoxel_paramters[paramType][paramKey]["options"]
+        selval = magicavoxel_parameters[paramType][paramKey]["options"]
 
     if keyType == "booltext":
-        value = magicavoxel_paramters[paramType][paramKey]["off"]
+        value = magicavoxel_parameters[paramType][paramKey]["off"]
 
     if callback == "init" or callback == "animation":
         if paramType in config["keyframe"][int(keyframeNum)]:
@@ -737,7 +737,7 @@ def rebuild():
                         with dpg.child_window(autosize_x=True,height=160):
                             dpg.add_text("Keyframe options")
                             dpg.add_separator()
-                            for mvcommand,dictval in magicavoxel_paramters["option"].items():
+                            for mvcommand,dictval in magicavoxel_parameters["option"].items():
                                 mvcommand = str(mvcommand)
                                 if mvcommand in config["keyframe"][intnextkeyframe]["option"]:
                                     value = config["keyframe"][intnextkeyframe]["option"][mvcommand]
@@ -748,7 +748,7 @@ def rebuild():
                         with dpg.child_window(autosize_x=True,height=140):
                             dpg.add_text("Keyframe Animation options")
                             dpg.add_separator()
-                            for mvcommand,dictvalue in magicavoxel_paramters["animation"].items():
+                            for mvcommand,dictvalue in magicavoxel_parameters["animation"].items():
                                 mvcommand = str(mvcommand)
                                 if mvcommand in config["keyframe"][intnextkeyframe]["animation"]:
                                     value = config["keyframe"][intnextkeyframe]["animation"][mvcommand]
@@ -765,11 +765,11 @@ def rebuild():
                             with dpg.tab_bar(label="param_bar",tag="param_bar:"+strnextkeyframe,parent="window:paramselection"+strnextkeyframe):
                                 dpg.add_tab(label="Camera",tag="camera_tab:"+strnextkeyframe,parent="param_bar:"+strnextkeyframe)
                                 dpg.add_tab(label="Light",tag="light_tab:"+strnextkeyframe,parent="param_bar:"+strnextkeyframe)
-                                for mvcommand,value in magicavoxel_paramters["light"].items():
+                                for mvcommand,value in magicavoxel_parameters["light"].items():
                                     #Tag = keyframe:set pt_fix_focus:0 e.g Keyframe + key + num Keyframe
                                     mvcommand = str(mvcommand)
                                     dpg.add_button(label=value["desc"],tag="param_button:"+mvcommand+":"+strnextkeyframe,parent="light_tab:"+strnextkeyframe,callback=translateNewParam,user_data=(intnextkeyframe,mvcommand,value,"param"))
-                                for mvcommand,value in magicavoxel_paramters["camera"].items():
+                                for mvcommand,value in magicavoxel_parameters["camera"].items():
                                     #Tag = keyframe:set pt_fix_focus:0 e.g Keyframe + key + num Keyframe
                                     mvcommand = str(mvcommand)
                                     dpg.add_button(label=value["desc"],tag="light_button:"+mvcommand+":"+strnextkeyframe,parent="camera_tab:"+strnextkeyframe,callback=translateNewParam,user_data=(intnextkeyframe,mvcommand,value,"param"))
@@ -1011,7 +1011,7 @@ with dpg.window(tag="Primary Window",label="Config Generator",menubar=True):
         #global settings
         dpg.add_text("Global Settings")
         dpg.add_separator()
-        for mvcommand,value in magicavoxel_paramters["global"].items():
+        for mvcommand,value in magicavoxel_parameters["global"].items():
             mvcommand = str(mvcommand)
             translateNewParam("globalinit","",("",mvcommand,value,"global"))
     with dpg.child_window(tag="Second Window",parent="Primary Window",height=750,no_scrollbar=True):
