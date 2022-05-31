@@ -2,17 +2,13 @@ from copy import deepcopy
 import json
 import dearpygui.dearpygui as dpg
 
-global config 
 config = {}
 config["keyframe"] = []
-global setup
-setup =False
-global tabpos
+setup = False
 tabpos = {}
 configVersion = 3
 
-global magicavoxel_parameters
-magicavoxel_paramters = { 
+magicavoxel_paramters = {
     "camera":{
         "cam rx": {
             "desc":"Camera Pitch",
@@ -27,7 +23,7 @@ magicavoxel_paramters = {
             "max":"180"
         },
         "cam rz":{
-            "desc":"Camera Roll", 
+            "desc":"Camera Roll",
             "optionType":"float",
             "min":"-180",
             "max":"180"
@@ -205,7 +201,7 @@ magicavoxel_paramters = {
             "max":"180"
         },
         "cam rz":{
-            "desc":"Camera Roll", 
+            "desc":"Camera Roll",
             "optionType":"float",
             "min":"-180",
             "max":"180"
@@ -407,7 +403,7 @@ magicavoxel_paramters = {
         "enable animation":{
             "desc":"Enable animation",
             "optionType":"bool"
-            
+
         },
         "loop":{
             "desc":"Loop animation - Frames will always loop back to 0",
@@ -478,7 +474,7 @@ def readJson():
 def readMagicaCam():
 
     with dpg.file_dialog(directory_selector=False, show=True, id="file_dialog_id",height=600):
-       
+
         dpg.add_file_extension("", color=(150, 255, 150, 255))
         dpg.add_file_extension(".txt", color=(255, 0, 255, 255), custom_text="[header]")
         dpg.add_file_extension(".*")
@@ -486,7 +482,7 @@ def readMagicaCam():
 
 
 ########################################################################################################################
-#Config functionality 
+#Config functionality
 def deleteParamterButton(callback,data,userdata):
     delparam = userdata[0]
     callbackdata = userdata[1]
@@ -520,12 +516,12 @@ def fillConfig(keyframe,param,value,attribute):
             config["global"] = {}
             config["global"]["saverenders"] = "true"
         config["global"][param] = value
-    else: 
+    else:
         keyframe = int(keyframe)
         try:
             if "param" not in config["keyframe"][keyframe] and keyframe != "":
                 pass
-        except: 
+        except:
             config["keyframe"].append({})
             config["keyframe"][keyframe]["param"] = {}
             config["keyframe"][keyframe]["option"] = {}
@@ -559,7 +555,7 @@ def writeToConfig(callback,data,userdata):
     fillConfig(keyframe,param,value,attribute)
 
 ########################################################################################################################
-#Tab functionality 
+#Tab functionality
 
 def tabOrder():
     if dpg.does_item_exist("keyframe_bar") == True:
@@ -581,14 +577,14 @@ def tabOrder():
 def deleteTabButton(callback,data,userdata):
     global config
     try:
-        KeyFrameNum = len(config["keyframe"])-1         #len starts counting from 1 instead of 0 
-        deleteKeyframe = "keyframe:"+str(KeyFrameNum)  #keyframe + last keyframe number = keyframe:1 
+        KeyFrameNum = len(config["keyframe"])-1         #len starts counting from 1 instead of 0
+        deleteKeyframe = "keyframe:"+str(KeyFrameNum)  #keyframe + last keyframe number = keyframe:1
     except TypeError:
         pass
     #else:
      #   deleteKeyframe = userdata[0]
      #   KeyFrameNum = userdata[1]
-    
+
     #print("Delete keyframe: " + deleteKeyframe)
     if dpg.does_alias_exist(deleteKeyframe) == True:
         dpg.delete_item(deleteKeyframe)
@@ -601,12 +597,12 @@ def addNewTabButton(callback,data):
         fillConfig(0,"","","keyframe")
         #print("Add new keyframe: " + "keyframe:0")
     else:
-        fillConfig(len(config["keyframe"]),"","","keyframe")  
+        fillConfig(len(config["keyframe"]),"","","keyframe")
 
     rebuild()
     newtab = "keyframe:"+str(len(config["keyframe"])-1)
     dpg.set_value("keyframe_bar",newtab)
-    
+
     updateTimeLine()
 
 def sync(keyframe):
@@ -619,9 +615,9 @@ def sync(keyframe):
 
 def translateNewParam(callback,data,userdata):
     global setup
-    global config 
+    global config
     #Userdata 0 = keyframe num
-    #Userdata 1 = param name/key 
+    #Userdata 1 = param name/key
     #Userdata 2 = param value
     #Userdata 3 = attribute
 
@@ -650,12 +646,12 @@ def translateNewParam(callback,data,userdata):
                 value = 0
             elif keyType == "bool":
                 value = False
-            else: 
+            else:
                 value = ""
 
     if keyType == "select":
         selval = magicavoxel_paramters[paramType][paramKey]["options"]
-    
+
     if keyType == "booltext":
         value = magicavoxel_paramters[paramType][paramKey]["off"]
 
@@ -669,7 +665,7 @@ def translateNewParam(callback,data,userdata):
 
     if dpg.does_alias_exist(tagKey) != True:
         fillConfig(keyframeNum,paramKey,value,paramType)
-                
+
         if keyType == "float":
             with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
                 #dpg.add_image_button(texture_tag="trashImg",width=13,height=13,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData))
@@ -689,14 +685,14 @@ def translateNewParam(callback,data,userdata):
         elif keyType == "select":
             with dpg.group(parent=parentKey,horizontal=True,tag="group:"+tagKey):
                 dpg.add_combo(items=selval,tag=tagKey,label=labelName,parent="group:"+tagKey,default_value=value,callback=writeToConfig,user_data=callbackData,width=200)
-        
+
         if paramType == "param":
             dpg.add_button(label="Del",width=35,height=19,callback=deleteParamterButton,user_data=("group:"+tagKey,callbackData),parent="group:"+tagKey,before=tagKey)
 
         if "tooltip" in userdata[2]:
             with dpg.tooltip(tag="tooltip:"+tagKey,parent=tagKey):
                 dpg.add_text(userdata[2]["tooltip"],parent="tooltip:"+tagKey)
-                
+
 
 
 
@@ -711,12 +707,12 @@ def rebuild():
         tabOrder()
         currenttab = dpg.get_value("keyframe_bar")
         dpg.delete_item("keyframe_bar")
-   
-    
+
+
     with dpg.tab_bar(label="keyframe_bar",tag="keyframe_bar",parent="Second Window",reorderable=True,track_offset=True):
         dpg.add_tab_button(label="+",tag="add",trailing=True,callback=addNewTabButton)
         dpg.add_tab_button(label="-",tag="remove",trailing=True,callback=deleteTabButton)
-    
+
     for i in range(len(config["keyframe"])):
         if len(tabpos) > i and len(tabpos) != 0:
             intnextkeyframe = tabpos[i][1]
@@ -781,8 +777,8 @@ def rebuild():
                             dpg.add_text("Statistics")
                             dpg.add_separator()
                             #print("what"+nextkeyframe)
-    
-    
+
+
         for mvcommand,value in config["keyframe"][intnextkeyframe].items():
             #print("Create new param button")
             if mvcommand == "param":
@@ -790,10 +786,10 @@ def rebuild():
                 for key,value in value.items():
                     translateNewParam("init",mvcommand,(intnextkeyframe,key,"","param",value))
                         #Userdata 0 = keyframe num
-                        #Userdata 1 = param name/key 
+                        #Userdata 1 = param name/key
                         #Userdata 2 = param value
                         #Userdata 3 = attribute
-    
+
         if intnextkeyframe != 0:
             sync(intnextkeyframe)
     #print(currenttab)
@@ -804,7 +800,7 @@ def rebuild():
     updateStats()
 
 ########################################################################################################################
-#TimeLine  
+#TimeLine
 
 #Pretty clumsy but it works
 def updateTimeLine():
@@ -830,7 +826,7 @@ def updateTimeLine():
                         elif config ["keyframe"][keyframenum]["option"]["interpolation"] == "bezier":#
                             frameamount = 0
                             textKey = keyframenum
-                            startKey = keyframenum 
+                            startKey = keyframenum
                             if keyframenum < len(config["keyframe"])-1:
                                 frameamount = config["keyframe"][keyframenum]["option"]["frames"]
                                 if config["keyframe"][keyframenum+1]["option"]["interpolation"] == "bezier-sequence":
@@ -844,7 +840,7 @@ def updateTimeLine():
                                         #print(keyframenum)
                                         if j+1 >= len(config["keyframe"])-1:
                                             break
-                        else: 
+                        else:
                             frameamount = 0
                         for i in range(frameamount):
                             #print("keyframe:"+str(i))
@@ -852,33 +848,33 @@ def updateTimeLine():
                                 colour = (200,200,255,255)
                             elif config["keyframe"][keyframenum]["option"]["interpolation"] == "bezier" or config["keyframe"][keyframenum]["option"]["interpolation"] == "bezier-sequence":
                                 colour = (60,255,20,255)
-                            else: 
+                            else:
                                 colour = (255,0,0,255)
                             if i == 0:
                                 colour = (255,255,0,255)
                             if i % 10 == 0:
                                 if i == 0:
-                                    dpg.draw_rectangle( pmin=(0+offset,30),     # top left corner 
+                                    dpg.draw_rectangle( pmin=(0+offset,30),     # top left corner
                                                         pmax=(1+offset,75),     # bottom right corner
                                                         color=colour,thickness=1)
                                     dpg.add_text(str(i),pos=(offset+5,120),parent="timeline",)
                                     dpg.add_text("KeFr:"+str(textKey),pos=(offset+5,40),parent="timeline",)
                                 elif i % 25 == 0:
-                                        dpg.draw_rectangle( pmin=(0+offset,35),     # top left corner 
+                                        dpg.draw_rectangle( pmin=(0+offset,35),     # top left corner
                                                             pmax=(1+offset,70),     # bottom right corner
                                                             color=colour,thickness=1)
                                         dpg.add_text(str(i),pos=(offset+5,120),parent="timeline",)
                                 else:
-                                    dpg.draw_rectangle( pmin=(0+offset,40),     # top left corner 
+                                    dpg.draw_rectangle( pmin=(0+offset,40),     # top left corner
                                                         pmax=(1+offset,65),     # bottom right corner
                                                         color=colour,thickness=1,)
                                 offset += 8
                         totalframes = frameamount + totalframes
-                    
+
 
                         keyframenum = keyframenum + 1
-                
-                dpg.draw_rectangle( pmin=(0+offset,30),     # top left corner 
+
+                dpg.draw_rectangle( pmin=(0+offset,30),     # top left corner
                     pmax=(1+offset,75),     # bottom right corner
                     color=(255,255,0,255),thickness=1)
                 dpg.add_text("KeFr:"+str(len(config["keyframe"])-1),pos=(offset+5,40),parent="timeline",)
@@ -897,7 +893,7 @@ def updateTimeLine():
         dpg.set_item_width("drawlist",offset+200)
             #calculate bounding box
     updateStats()
-                      
+
 def updateStats():
     totaltime = 0
     try:
@@ -910,7 +906,7 @@ def updateStats():
             if "secondsperrender" in config["keyframe"][keyframenum]["option"]:
                 totaltime = round((config["keyframe"][keyframenum]["option"]["frames"]*(config["keyframe"][keyframenum]["option"]["secondsperrender"]+2))/60 + totaltime)
             else:
-                return 
+                return
 
 
 
@@ -932,7 +928,7 @@ def updateStats():
 
             if dpg.does_alias_exist("statistics_group:"+str(keyframenum)) == True:
                 dpg.delete_item("statistics_group:"+str(keyframenum))
-                
+
             #print(str(keyframenum))
 
 
@@ -944,7 +940,7 @@ def updateStats():
                 else:
                     dpg.add_text("Interpolation: "+str(config["keyframe"][keyframenum]["option"]["interpolation"]),parent="statistics_group:"+str(keyframenum))
                     issequence = "False"
-                
+
                 dpg.add_text("In Sequence: "+ issequence,parent="statistics_group:"+str(keyframenum))
                 estimate = round((config["keyframe"][keyframenum]["option"]["frames"]*(config["keyframe"][keyframenum]["option"]["secondsperrender"]+2))/60)
                 dpg.add_text("Keyframe rendertime: "+str(estimate) + " minutes",parent="statistics_group:"+str(keyframenum))
@@ -963,7 +959,7 @@ def updateStats():
   #                if param not in params:
   #                    params.append(param)
   #                    lenght.append(len(param))
-  #        if 
+  #        if
   #        dpg.add_text("Parameters:"+str(lenght[i]))
   #        print(params)
 
@@ -982,7 +978,7 @@ dpg.create_context()
 
 #look for trash.png in the same directory as this script and in ui folder
 #dpg.load_image("trash.png")
-#  try: 
+#  try:
 #      path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'ui', 'trash.png'))
 #
 #      width, height, channels, data = dpg.load_image(path)
@@ -1019,7 +1015,7 @@ with dpg.window(tag="Primary Window",label="Config Generator",menubar=True):
             mvcommand = str(mvcommand)
             translateNewParam("globalinit","",("",mvcommand,value,"global"))
     with dpg.child_window(tag="Second Window",parent="Primary Window",height=750,no_scrollbar=True):
-        with dpg.tab_bar(label="keyframe_bar",tag="keyframe_bar"):    
+        with dpg.tab_bar(label="keyframe_bar",tag="keyframe_bar"):
             dpg.add_tab_button(label="+",tag="add",trailing=True,callback=addNewTabButton)
             dpg.add_tab_button(label="-",tag="remove",trailing=True,callback=deleteTabButton)
     with dpg.child_window(tag="Third Window",height=150,parent="Primary Window",width=950):
@@ -1027,7 +1023,7 @@ with dpg.window(tag="Primary Window",label="Config Generator",menubar=True):
             dpg.add_text("Timeline")
             dpg.add_button(label="Refresh timeline",tag="refresh",callback=updateTimeLine)
         dpg.add_separator()
-    
+
 if config["keyframe"] != []:
     rebuild()
     updateTimeLine()
@@ -1040,4 +1036,3 @@ dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.start_dearpygui()
 dpg.destroy_context()
-
