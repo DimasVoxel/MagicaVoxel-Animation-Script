@@ -123,6 +123,9 @@ def beznormalise(lerparray, firstkeyframe, lastkeyframe, data):
 
 
 def bezier(lerparray, perc):
+    if len(lerparray) == 0:
+        print("It seems bezier() received an empty lerparray. This shouldn't have happened. Please report this on https://github.com/DimasVoxel/MagicaVoxel-Animation-Script/issues with some context so we can fix this issue for in the future.")
+        return 0
     while len(lerparray) > 1:
         lerparray = [lerp(a, b, perc) for a, b in zip(lerparray, lerparray[1:])] #Only slice the second one, because the zip will slice the first one
     return lerparray[0]
