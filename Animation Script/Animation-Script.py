@@ -1,7 +1,6 @@
 import os
 import sys
 
-from typing import Optional
 import pyperclip
 import time
 import json
@@ -56,7 +55,7 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
 
     if isdupicate == False:
         print('The animation has been stopped since there are no parameters to animate.\nFor an animation you need atleast 2 keyframes with the same parameter')
-        print('Skipping Keyframes: '+str(firstkeyframe)+' to '+str(lastkeyframe))
+        print(f'Skipping Keyframes: {firstkeyframe} to {lastkeyframe}')
         return
 
     for frame in range(ammountframes):
@@ -75,7 +74,7 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
             if key.find('ry') != -1:
                 lerparray = beznormalise(lerparray,firstkeyframe,lastkeyframe,data)
 
-            commandstring = commandstring + key + ' ' + str(round(bezier(lerparray, frame/ammountframes,key),4)) + ' | '
+            commandstring = commandstring + key + ' ' + str(round(bezier(lerparray, frame/ammountframes),4)) + ' | '
             if len(commandstring) > 400:
                 command.append(commandstring)
                 commandstring = ''
@@ -84,61 +83,53 @@ def beziersetup(firstkeyframe, lastkeyframe, data, ammountframes):
 
         try: print('#'*(os.get_terminal_size().columns))
         except (OSError, ValueError): pass
-        print('\nLast command: ' + str(command))
-        print('Frame: ' + str(frame+1) + ' of ' + str(ammountframes))
+        print(f'\nLast command: {command}')
+        print(f'Frame: {frame+1} of {ammountframes}')
         mvinput(command,float(data['keyframe'][firstkeyframe]['option']['secondsperrender']))
 
         #endtimer
         endtime = time.time()
 
 
-        print('\nTime taken: ' + str(round(endtime - starttime,2)) + ' seconds')
+        print(f'\nTime taken: {endtime - starttime:.2f} seconds')
         #estimate time left time x frames
-        print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame),2)) + ' seconds')
-        print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame)/60,2)) + ' minutes')
-        print('Estimated time left: ' + str(round((endtime - starttime) * (ammountframes - frame) / 3600,2)) + ' hours')
+        time_estimate = (endtime - starttime) * (ammountframes - frame)
+        print(f'Estimated time left: {time_estimate:.2f} seconds')
+        print(f'Estimated time left: {time_estimate/60:.2f} minutes')
+        print(f'Estimated time left: {time_estimate/3600:.2f} hours')
 
-def beznormalise(lerparray,firstkeyframe,lastkeyframe,data):
-    newlerparray = []
-    newlerparray.append(lerparray[0])
+def beznormalise(lerparray, firstkeyframe, lastkeyframe, data):
+    '''
+    Normalises angles, such that they will wrap around correctly around 360 degrees, and will rotate in the right direction.
+    If the next angle is the same as the previous angle, it will assume a full rotation.
+    '''
+    newlerparray = [lerparray[0]]
     for i in range(firstkeyframe,lastkeyframe):
-        p_yaw = newlerparray[i]
-        n_yaw = data["keyframe"][i+1]["param"]["cam ry"]
+        p_yaw = newlerparray[-1]
+        n_yaw = data['keyframe'][i+1]['param']['cam ry']
 
-
-        if data["keyframe"][i]["option"]["direction"] == "Clockwise":
-            if n_yaw > p_yaw:
-                newlerparray.append(newlerparray[i]+(n_yaw-p_yaw))
-            if n_yaw < p_yaw:
-                while n_yaw < p_yaw:
-                    n_yaw = n_yaw + 360
-                newlerparray.append(newlerparray[i]+(n_yaw-p_yaw))
-        if data["keyframe"][i]["option"]["direction"] == "Counterclockwise":
-            if n_yaw < p_yaw:
-                newlerparray.append(newlerparray[i]+(n_yaw-p_yaw))
-            if n_yaw > p_yaw:
-                while n_yaw > p_yaw:
-                    n_yaw = n_yaw - 360
-                newlerparray.append(newlerparray[i]+(n_yaw-p_yaw))
-
+        if data['keyframe'][i+1]['option']['direction'] == 'Clockwise':
+            while n_yaw <= p_yaw:
+                n_yaw = n_yaw + 360
+            newlerparray.append(n_yaw)
+        elif data['keyframe'][i+1]['option']['direction'] == 'Counterclockwise':
+            while n_yaw >= p_yaw:
+                n_yaw = n_yaw - 360
+            newlerparray.append(n_yaw)
+        elif data['keyframe'][i+1]['option']['direction'] == 'Static':
+            newlerparray.append(p_yaw)
 
     return newlerparray
 
 
-
-
-def bezier(lerparray, frame,key):
-    newlerparray = []
+def bezier(lerparray, perc):
+    if len(lerparray) == 0:
+        print("It seems bezier() received an empty lerparray. This shouldn't have happened. Please report this on https://github.com/DimasVoxel/MagicaVoxel-Animation-Script/issues with some context so we can fix this issue for in the future.")
+        return 0
     while len(lerparray) > 1:
-        for i in range(len(lerparray)-1):
-            newlerparray.append(float(lerp(lerparray[i],lerparray[i+1],frame)))
-        if len(newlerparray) == 0:
-            newlerparray.append(0)
-        if len(newlerparray) == 1:
-            return float(newlerparray[0])
-        else:
-            lerparray = newlerparray
-            newlerparray = []
+        lerparray = [lerp(a, b, perc) for a, b in zip(lerparray, lerparray[1:])] #Only slice the second one, because the zip will slice the first one
+    return lerparray[0]
+
 
 def lerp(a, b, t):
     return float(a + (b - a) * t)
@@ -226,7 +217,7 @@ def liniar(currentkeyframe, data):
                     startPos = float(data['keyframe'][currentkeyframe]['param'][key])
                     goalPos = float(data['keyframe'][currentkeyframe+1]['param'][key])
                 except KeyError:
-                    print('\nERROR: Parameter '+ key + ' is missing in target keyframe. Parameter is being skipped.')
+                    print(f'\nERROR: Parameter {key} is missing in target keyframe. Parameter is being skipped.')
                     goalPos = startPos
 
                 if key.find('ry') != -1: #There should be a function that does normalisation for all parameters that require it not just cam ry / yaw
@@ -247,18 +238,19 @@ def liniar(currentkeyframe, data):
 
             #endtimer
 
-            print('Frame: ' + str(i) + ' of ' + str(totalframeCurKeyframe-1))
+            print(f'Frame: {i} of {totalframeCurKeyframe-1}')
 
 
             mvinput(command,secondPerRender)
 
             endtime = time.time()
 
-            print('\nTime taken: ' + str(round(endtime - starttime,2)) + ' seconds')
+            print(f'\nTime taken: {endtime - starttime:.2f} seconds')
+            time_estimate = (endtime - starttime) * (totalframeCurKeyframe - i)
             #estimate time left time x frames
-            print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i),2)) + ' seconds')
-            print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i)/60,2)) + ' minutes')
-            print('Estimated time left: ' + str(round((endtime - starttime) * (totalframeCurKeyframe - i) / 3600,2)) + ' hours\n')
+            print(f'Estimated time left: {time_estimate:.2f} seconds')
+            print(f'Estimated time left: {time_estimate/60:.2f} minutes')
+            print(f'Estimated time left: {time_estimate/3600:.2f} hours\n')
             try: print('#'*(os.get_terminal_size().columns))
             except (OSError, ValueError): pass
 
@@ -304,6 +296,9 @@ def mvinput(command,secondPerRender):
 
 
 def pause(firsttime):
+    '''
+    Waits until MagicaVoxel is set to the foreground (again), to make sure no inputs are given if the user switches to a different program during execution.
+    '''
     if firsttime:
         while not magicaIsForeground():   #Detect if magicavoxel is active to not spam mv commands into normal user programms like discord
             time.sleep(3)
@@ -333,5 +328,5 @@ except KeyboardInterrupt:
     sys.exit(0)
 
 #let console open till user closes it
-print('Finished in --- %s seconds ---' % (round(time.time() - start_time)))
+print(f'Finished in --- {time.time() - start_time:.0f} seconds ---')
 input()
